@@ -1,0 +1,536 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
+  overflow-x: hidden;
+}
+
+img {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.top-nav {
+  margin-top: 20px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.top-nav a {
+  color: #7c7c7c;
+  text-decoration: none;
+  font-size: -0.18712rem;
+}
+
+.top-nav ul li {
+  font-size: 0.793rem;
+  color: #334141;
+  border-right: 1px solid rgba(124, 124, 124, 0.3);
+  padding-right: 10px;
+}
+
+.menu-content {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 300px;
+  background-color: #ffffff;
+  border-right: 1px solid #ffffff;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  z-index: 999;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.menu-content.open {
+  transform: translateX(0);
+}
+
+.menu-content.open {
+  transform: translateX(-300px);
+}
+
+.Logo {
+  color: #333e48;
+  font-weight: bold;
+}
+
+.menu-content ul li {
+  list-style: none;
+}
+
+.menu-content ul li a {
+  padding-top: .4rem;
+  padding-bottom: .4rem;
+  display: flex;
+  align-items: center;
+  color: #333e48;
+  text-decoration: none !important;
+  font-size: 14px;
+}
+
+.border-primary {
+  border-color: #1f9589 !important;
+}
+
+.form-control {
+  border-width: 2px !important;
+  border-top-left-radius: 6.1875rem;
+  border-bottom-left-radius: 6.1875rem;
+  height: 41px;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust opacity as needed */
+  z-index: 998; /* Ensure it's below the cart window */
+  display: none; /* Initially hidden */
+}
+
+.overlay.open {
+  display: block; /* Display when cart is open */
+}
+
+.cart-window {
+  border-top: 2px solid #1f9589;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 332px;
+  height: 100%;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform: translateY(calc(-100% - 20px));
+  opacity: 0;
+  z-index: 999;
+}
+
+.cart-window.open {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.cart-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.checkout-button {
+  padding-top: 10px;
+  margin-bottom: 80px;
+}
+
+.slider {}
+
+.custom-col {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.custom-col img {
+  margin-left: 2.5px;
+  margin-right: 2.5px;
+}
+
+.img-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.img-container img {
+  width: 100%;
+  display: block;
+}
+
+.glass-effect {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.img-container:hover .glass-effect {
+  left: 100%;
+}
+/* CSS for the overlay */
+
+
+.overlay.open {
+  display: block; /* Display when cart is open */
+}
+.card-img-top{
+  transition: transform 0.2s ease-in-out; /* Smooth transition for the transform property */
+  transform-origin: center center; /* Set the transform origin to the center of the image */
+}
+.card-img-top:hover{
+  transform: scale(1.05); /* Zoom in by 5% when hovering */
+
+}
+.Products{
+
+}
+.carousel-img {
+  width: 198px;
+  height: 198px;
+  margin: 0 1px !important; /* Adjust this value to set the gap between images */
+}
+
+#slide .wide-slider {
+  width: 80%; /* Adjust as needed */
+  margin: auto;
+}
+#slide .wide-slider .carousel-item img {
+  object-fit: cover; /* Ensures the image covers the entire slide */
+  height: 400px; /* Adjust the height as needed */
+}
+.image-container .main-image {
+  transition: transform 0.3s ease; /* Add a smooth transition for the rotation and zoom */
+}
+
+.image-container:hover .main-image {
+  transition: 0.5s !important;
+  transform:  scale(1.1); /* Rotate slightly and zoom in on hover */
+ 
+}
+
+.image-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust the opacity as needed */
+}
+
+.image-container {
+  position: relative;
+  width: 422px;
+  height: 442px;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust the opacity as needed */
+}
+.logo {
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  /* You can also set width and height properties for the logo if needed */
+}
+.bord{
+  border-top:1px solid ;
+  --tw-border-opacity: 1;
+    border-color: rgb(230 230 230 / var(--tw-border-opacity));
+    
+}
+footer p{
+  font-size: .875rem;
+        line-height: 1.25rem;
+        --tw-text-opacity: 1;
+    color: rgb(90 90 90 / var(--tw-text-opacity));
+}
+.custom-justify-content-center {
+margin-left: 60px;
+
+}
+.LoginRightSide{
+  background-color: #ffede1;
+  height: 100vh;
+}
+.loginBox{
+  position: relative;
+
+}
+.custom-footer{
+  margin: 0 !important;
+}
+.ProductsSize{
+
+  font-size: 14px;
+ border: 1px solid;
+ --tw-border-opacity: 3;
+    border-color: rgb(241 241 241 / var(--tw-border-opacity));
+  border-radius: .25rem;
+  padding: 10px;
+  margin: 0 12px 12px 0;
+  transition: border-color 0.5s ease; /* Specify the duration and timing function for the border color transition */
+
+}
+.borde{
+  border: 1px solid red;
+  --tw-border-opacity: 1;
+  border-color: rgb(241 241 241 / var(--tw-border-opacity))
+
+}
+.ProductsSize:hover{
+  border-color: #212121 !important;
+}
+.App {
+  text-align: center;
+}
+
+/* Styling for the modal */
+.modal-dialog {
+  margin-top: 20vh;
+}
+
+.custom-modal .modal-content {
+  background: url('../public/images/newsletter_popup_bg.jpg') no-repeat top right;
+  background-size: cover ; /* Adjust the size as needed */
+  padding: 64px 40px;
+  height: auto;
+  border-radius: 0;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.12);
+
+  width: 740px;
+}
+.sletterinput{
+  height: auto;
+    padding: 7px 12px 9px 22px;
+    border-radius: 3rem 0 0 3rem;
+    font-size: 1.06rem;
+    line-height: 2.4;
+    border: none;
+    background-color: #f4f4f4;
+}
+.sletterbtn{
+  height: 56px;
+  margin-left: -1px;
+    padding: 0 32px 0 25px;
+    border-radius: 0 3rem 3rem 0;
+    font-size: 1.06rem;
+    font-family: "Open Sans", sans-serif;
+    letter-spacing: 0;
+    text-align: center;
+    text-transform: uppercase;
+    border-color: #08C;
+    background-color: #08C;
+    color: #fff;
+    box-shadow: none;
+    transition: all 0.3s;
+    line-height: 1.429;
+}
+
+.kFXhoe{
+  height: 100% !important;
+}
+
+.bheoXG{
+  width: 475px !important;
+max-width: 100% !important;
+  height: 100% !important;
+  max-height: 617px !important;
+}
+.ekNzyA{
+  width: 475px !important;
+  max-width: 100% !important;
+    height: 100% !important;
+    max-height: 617px !important;
+}
+.table-responsive {
+  width: 100% !important;
+  overflow-x: auto !important;
+}
+
+.table-container {
+  min-width: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .asd{
+    margin-left: 10px;
+  }
+  .ffff{
+    margin-left: 20px !important;
+  }
+  .rrr{
+    display: flex;
+    flex-direction: column;
+  }
+  .fEjnjW{
+    width: 83%  !important;
+  }
+  .sletterinput{
+    width: 50%;
+    font-size: 15px;
+  }
+  .sletterbtn{
+    width: 50%;
+    font-size: 15px;
+
+  }
+  .App {
+    font-family: Arial, sans-serif;
+  }
+  
+  .sidebar {
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+  }
+  
+  .sidebar .sidebar-heading {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar .nav-link {
+    font-size: 1rem;
+  }
+  
+  .sidebar .upgrade-pro {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .hero-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .hero-section h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .trending-nfts .card {
+    margin-bottom: 20px;
+  }
+  
+  .custom-modal .modal-content {
+    background-position: center; /* Change background position */
+    padding: 32px 20px; /* Adjust padding if needed */
+    width: auto; /* Allow the modal to take full width */
+  }
+  .custom-modal .modal-content{
+    width: 100% !important;
+  }
+  .remf{
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .rema{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row !important;
+    justify-content: center;
+    align-items: center;
+  }
+  .rema img{
+    width: 30% !important;
+  }
+  .ProductDetailsImg{
+    width: 100% !important;
+    height: auto !important;
+  }
+  .remvo{
+    position: relative;
+    left: 10px !important;
+  }
+  .loginBox{
+    width: 100%;
+    padding:20px ;
+
+  }
+  .loginBox form input {
+    width: 100% !important;
+
+  }
+  .top-nav {
+    display: none;
+  }
+  #slide .wide-slider {
+    width: auto;
+    height: 100%;
+  }
+  .image-container{
+    width: 100%;
+  }
+  .m{
+    margin-top: 10px;
+
+  }
+  .Contact{
+    width: auto !important;
+    height: auto !important;
+  }
+  .custom-justify-content-center {
+    margin: 0 !important;
+  }
+  .Coll{
+    display: flex;
+    flex-direction: column !important;
+  }
+  .pr{
+    padding: 10px !important;
+  }
+}
+
+.app {
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  padding: 20px;
+  background-color: #f0f0f0;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+}
+
+ul {
+  list-style: none;
+}
+
+input[type="text"],
+input[type="checkbox"] {
+  margin-bottom: 10px;
+}
