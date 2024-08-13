@@ -129,12 +129,12 @@ const Sidebar = () => {
           <MenuText>Reports</MenuText>
         </StyledLink>
       </MenuItem>
-      <MenuItem>
+      {/* <MenuItem>
         <StyledLink to="/settings">
           <FaCog />
           <MenuText>Settings</MenuText>
         </StyledLink>
-      </MenuItem>
+      </MenuItem> */}
     </SidebarContainer>
   );
 };

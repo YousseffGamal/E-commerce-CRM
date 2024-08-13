@@ -27,6 +27,7 @@ const Content = styled.div`
   background-color: #f4f6f9;
   animation: ${fadeIn} 0.6s ease-in-out;
   transition: margin-left 0.3s ease;
+  
   @media (max-width: 768px) {
     margin-left: 60px; /* Adjust for mobile view */
   }
@@ -73,19 +74,27 @@ const Input = styled.input`
   }
 `;
 
-const Select = styled.select`
-  width: 100%;
-  padding: 14px;
-  border: 1px solid #dddddd;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
+const CheckboxGroup = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+`;
 
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-  }
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 200px;
+`;
+
+const Checkbox = styled.input`
+  cursor: pointer;
+`;
+
+const CheckboxLabel = styled.label`
+  font-size: 16px;
+  color: #333333;
 `;
 
 const Button = styled.button`
@@ -107,18 +116,25 @@ const Button = styled.button`
 const AddAdminPage = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('');
+  const [roles, setRoles] = useState({
+    admin: false,
+    editor: false,
+    viewer: false
+  });
 
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handleEmailChange = (e) => setEmail(e.target.value);
-  const handleRoleChange = (e) => setRole(e.target.value);
+  const handleRoleChange = (e) => {
+    const { name, checked } = e.target;
+    setRoles(prevRoles => ({ ...prevRoles, [name]: checked }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const newAdmin = {
       username,
       email,
-      role,
+      roles
     };
     console.log('New Admin:', newAdmin);
     // Add functionality to handle form submission
@@ -154,18 +170,21 @@ const AddAdminPage = () => {
               />
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="role">Role</Label>
-              <Select
-                id="role"
-                value={role}
-                onChange={handleRoleChange}
-                required
-              >
-                <option value="">Select a role</option>
-                <option value="admin">Admin</option>
-                <option value="editor">Editor</option>
-                <option value="viewer">Viewer</option>
-              </Select>
+              <Label>Roles</Label>
+              <CheckboxGroup>
+                {Object.keys(roles).map(role => (
+                  <CheckboxContainer key={role}>
+                    <Checkbox
+                      type="checkbox"
+                      id={role}
+                      name={role}
+                      checked={roles[role]}
+                      onChange={handleRoleChange}
+                    />
+                    <CheckboxLabel htmlFor={role}>{role.charAt(0).toUpperCase() + role.slice(1)}</CheckboxLabel>
+                  </CheckboxContainer>
+                ))}
+              </CheckboxGroup>
             </FormGroup>
             <Button type="submit">Add Admin</Button>
           </Form>
