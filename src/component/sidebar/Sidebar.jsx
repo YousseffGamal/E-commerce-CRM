@@ -88,9 +88,9 @@ const Sidebar = () => {
         </StyledLink>
       </MenuItem>
       <MenuItem>
-        <StyledLink to="/addrole">
+        <StyledLink to="/roles">
           <FaUserPlus />
-          <MenuText>Add Role</MenuText>
+          <MenuText>Roles</MenuText>
         </StyledLink>
       </MenuItem>
       <MenuItem>

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Sidebar from '../../component/sidebar/Sidebar';
 import styled from 'styled-components';
+import { Modal, Button, Form } from 'react-bootstrap';
 
 const AppContainer = styled.div`
   display: flex;
@@ -44,9 +45,19 @@ const Table = styled.table`
       background-color: #c82333;
     }
   }
+  .btn-primary {
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
 `;
 
 const Orders = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   const orders = [
     { id: 1, customer: 'John Doe', product: 'T-Shirt', quantity: 2, total: 40 },
     { id: 2, customer: 'Jane Smith', product: 'Jeans', quantity: 1, total: 40 },
@@ -73,6 +84,22 @@ const Orders = () => {
   const handleCancelOrder = (orderId) => {
     // Implement cancel order logic here
     console.log(`Cancel order with ID: ${orderId}`);
+  };
+
+  const handleUpdateOrder = (order) => {
+    setSelectedOrder(order);
+    setShowModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    setSelectedOrder(null);
+  };
+
+  const handleModalSave = () => {
+    // Implement save logic here
+    console.log(`Update order with ID: ${selectedOrder.id}`);
+    handleModalClose();
   };
 
   return (
@@ -104,6 +131,9 @@ const Orders = () => {
                     <button className="btn btn-danger btn-sm" onClick={() => handleCancelOrder(order.id)}>
                       Cancel
                     </button>
+                    <button className="btn btn-primary btn-sm" onClick={() => handleUpdateOrder(order)}>
+                      Update
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -111,6 +141,47 @@ const Orders = () => {
           </Table>
         </div>
       </Content>
+
+      {/* Update Modal */}
+      <Modal show={showModal} onHide={handleModalClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Update Order</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedOrder && (
+            <Form>
+              <Form.Group controlId="formOrderId">
+                <Form.Label>Order ID</Form.Label>
+                <Form.Control type="text" readOnly value={selectedOrder.id} />
+              </Form.Group>
+              <Form.Group controlId="formCustomerName">
+                <Form.Label>Customer</Form.Label>
+                <Form.Control type="text" value={selectedOrder.customer} />
+              </Form.Group>
+              <Form.Group controlId="formProduct">
+                <Form.Label>Product</Form.Label>
+                <Form.Control type="text" value={selectedOrder.product} />
+              </Form.Group>
+              <Form.Group controlId="formQuantity">
+                <Form.Label>Quantity</Form.Label>
+                <Form.Control type="number" value={selectedOrder.quantity} />
+              </Form.Group>
+              <Form.Group controlId="formTotal">
+                <Form.Label>Total</Form.Label>
+                <Form.Control type="number" value={selectedOrder.total} />
+              </Form.Group>
+            </Form>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleModalClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleModalSave}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </AppContainer>
   );
 };

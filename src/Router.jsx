@@ -8,15 +8,15 @@ import AddProduct from "./Pages/addProducts/Add Products";
 import Orders from './Pages/orders/Orders';
 import ManageProducts  from './Pages/editAndDeleteProducts/Edit And Delete Products';
 import Reports  from './Pages/reports/Reports';
-import AddRole from "./Pages/AddRole/AddRole"; // Adjust the import path as needed
-import BrandPage from "./Pages/BrandPage/BrandPage"; // Adjust the import path as needed
-import AddAdmin from "./Pages/AddAdmin/AddAdmin"; // Adjust the import path as needed
-import AddCategory from "./Pages/AddCategory/AddCategory"; // Adjust the import path as needed
-import AddSubcategory  from "./Pages/AddSubcategory/AddSubcategory"; // Adjust the import path as needed
-import UsersView  from "./Pages/UsersView/UsersView"; // Adjust the import path as needed
+import AddRole from "./Pages/AddRole/AddRole"; 
+import BrandPage from "./Pages/BrandPage/BrandPage"; 
+import AddAdmin from "./Pages/AddAdmin/AddAdmin"; 
+import AddCategory from "./Pages/AddCategory/AddCategory"; 
+import AddSubcategory  from "./Pages/AddSubcategory/AddSubcategory"; 
+import UsersView  from "./Pages/UsersView/UsersView"; 
 import Category from "./Pages/Category/Category"
-
-import Subcategory  from "./Pages/Subcategory/Subcategory"; // Adjust the import path as needed
+import Subcategory  from "./Pages/Subcategory/Subcategory"; 
+import Roles  from "./Pages/Roles/Roles"; 
 
 
 const AppRouter = () => {
@@ -40,6 +40,7 @@ const AppRouter = () => {
         <Route path="/usersview" element={<UsersView />} />
         <Route path="/category" element={<Category />} />
         <Route path="/subcategory" element={<Subcategory />} />
+        <Route path="/roles" element={<Roles />} />
 
 
 
