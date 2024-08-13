@@ -15,12 +15,8 @@ import AddCategory from "./Pages/AddCategory/AddCategory";
 import AddSubcategory  from "./Pages/AddSubcategory/AddSubcategory"; 
 import UsersView  from "./Pages/UsersView/UsersView"; 
 import Category from "./Pages/Category/Category"
-
 import Subcategory  from "./Pages/Subcategory/Subcategory"; 
 import Roles  from "./Pages/Roles/Roles"; 
-
-
-
 import ProtectedRoute from './utiliteis/protectedRoute';
 
 
