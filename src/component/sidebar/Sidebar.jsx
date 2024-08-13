@@ -149,12 +149,16 @@ const Sidebar = () => {
           <MenuText>Reports</MenuText>
         </StyledLink>
       </MenuItem>
-      <MenuItem>
+      {/* <MenuItem>
         <StyledLink to="/settings">
           <FaCog />
           <MenuText>Settings</MenuText>
         </StyledLink>
+
       </MenuItem>
+      
+
+      </MenuItem> */}
       <button onClick={handleLogOut}>logout</button>
       <button onClick={handleclick}>test</button>
     </SidebarContainer>
