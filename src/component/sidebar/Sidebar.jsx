@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FaHome, FaShoppingCart, FaChartBar, FaCog, FaEdit, FaUserPlus, FaTag, FaPlusCircle, FaUsers } from 'react-icons/fa';
 import { FiPlus } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link ,useNavigate} from 'react-router-dom';
 
 const SidebarContainer = styled.div`
   width: 250px;
@@ -58,8 +58,28 @@ const StyledLink = styled(Link)`
   align-items: center;
   width: 100%;
 `;
-
+import axiosInstance from "../../axios";
+import { useAuth } from '../../store/authContext';
 const Sidebar = () => {
+
+
+  const navigate = useNavigate();
+  const {logout} = useAuth()
+
+  const handleclick = async () =>{
+  const data= await axiosInstance.get('/getallusers')
+  console.log(data)
+  }
+
+
+
+
+  const handleLogOut = () =>{
+     logout()
+     navigate('/')
+   
+  }
+
   return (
     <SidebarContainer>
       <SidebarHeader>CRM</SidebarHeader>
@@ -135,6 +155,8 @@ const Sidebar = () => {
           <MenuText>Settings</MenuText>
         </StyledLink>
       </MenuItem>
+      <button onClick={handleLogOut}>logout</button>
+      <button onClick={handleclick}>test</button>
     </SidebarContainer>
   );
 };

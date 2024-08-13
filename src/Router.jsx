@@ -17,7 +17,7 @@ import UsersView  from "./Pages/UsersView/UsersView"; // Adjust the import path 
 import Category from "./Pages/Category/Category"
 
 import Subcategory  from "./Pages/Subcategory/Subcategory"; // Adjust the import path as needed
-
+import ProtectedRoute from './utiliteis/protectedRoute';
 
 const AppRouter = () => {
   return (
@@ -25,6 +25,9 @@ const AppRouter = () => {
    
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route element={<ProtectedRoute redirectTo="/" />}>
+        
+        
         <Route path="/crm" element={<CRM />} />
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/addproduct" element={<AddProduct />} />
@@ -44,6 +47,10 @@ const AppRouter = () => {
 
 
 
+        
+        
+        </Route>
+       
       
 
 
