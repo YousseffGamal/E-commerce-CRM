@@ -15,8 +15,13 @@ import AddCategory from "./Pages/AddCategory/AddCategory";
 import AddSubcategory  from "./Pages/AddSubcategory/AddSubcategory"; 
 import UsersView  from "./Pages/UsersView/UsersView"; 
 import Category from "./Pages/Category/Category"
+
 import Subcategory  from "./Pages/Subcategory/Subcategory"; 
 import Roles  from "./Pages/Roles/Roles"; 
+
+
+
+import ProtectedRoute from './utiliteis/protectedRoute';
 
 
 const AppRouter = () => {
@@ -25,6 +30,9 @@ const AppRouter = () => {
    
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route element={<ProtectedRoute redirectTo="/" />}>
+        
+        
         <Route path="/crm" element={<CRM />} />
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/addproduct" element={<AddProduct />} />
@@ -45,6 +53,10 @@ const AppRouter = () => {
 
 
 
+        
+        
+        </Route>
+       
       
 
 

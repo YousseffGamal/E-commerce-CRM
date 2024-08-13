@@ -6,11 +6,11 @@ import Footer from '../../component/footer/footer';
 import arrow from "../../../public/images/ant-design_swap-left-outlined.png"
 import WOW from 'wow.js'
 import { Link, useNavigate } from 'react-router-dom';
-
+import { useAuth } from '../../store/authContext';
 import 'animate.css/animate.min.css';
 import axiosInstance from '../../axios';
 function Login() {
-
+  const {login} = useAuth()
     const navigate = useNavigate();
         const [formData, setFormData] = useState({
           email: '',
@@ -27,18 +27,11 @@ function Login() {
         };
 
         const handleSubmit = async (e) => {
-            e.preventDefault();
-            
-              axiosInstance.post('/signin',formData)
-              .then((res) =>{
-                console.log(res.data)
-                navigate('crm')
-              })
-              .catch((err) =>{
-                console.log(err)
-              })
-            
-        }
+          e.preventDefault();
+       await login(formData)
+       navigate('crm')
+      }
+
 
   useEffect(() => {
  
@@ -48,8 +41,7 @@ function Login() {
             {/* Start of login */}
             <section>
                 <div className="container-fluid">
-                    {formData.email}
-                    {formData.password}
+                   
                     <div className="row ">
                     <div className="col-md-7 d-flex justify-content-center align-items-center" >
     <div className="loginBox wow animate__animated animate__fadeInUp" style={{boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", padding: "50px", borderRadius: "10px"}}>
@@ -63,20 +55,18 @@ function Login() {
         <form style={{marginTop:"30px"}} onSubmit={handleSubmit}>
             <div className="form-group">
                 <label  style={{fontSize:"14px",opacity:"0.9"}} htmlFor="exampleInputEmail1">Email</label>
-                <input style={{width: "478px", border: "1px solid #FFF6F4", background: "#FFF6F4", borderRadius: "5px"}} type="email" className="form-control mt-1" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Test@gmail.com " name="email" value={formData.email}  onChange={handleChange}/>
+                <input style={{width: "478px", border: "1px solid #FFF6F4", background: "#FFF6F4", borderRadius: "5px"}} type="email" className="form-control mt-1" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Test@gmail.com " name="email" value={formData.email}  onChange={handleChange} required />
             </div>
             <div className="form-group mt-4">
                 <label style={{fontSize:"14px",opacity:"0.9"}} htmlFor="exampleInputPassword1">Password</label>
-                <input style={{width: "478px", border: "1px solid #FFF6F4", background: "#FFF6F4", borderRadius: "5px"}} type="password" className="form-control mt-1" id="exampleInputPassword1" placeholder="*********" name="password" value={formData.password}   onChange={handleChange} />
+                <input style={{width: "478px", border: "1px solid #FFF6F4", background: "#FFF6F4", borderRadius: "5px"}} type="password" className="form-control mt-1" id="exampleInputPassword1" placeholder="*********" name="password" value={formData.password}   onChange={handleChange} required />
             </div>
             <div className='d-flex justify-content-center align-items-center' style={{marginTop:"50px"}}>
             <button style={{background:"#F47458",width:"150px",height:"46px", border:"1px solid #F47458", borderRadius:"23px",fontSize:"16px",fontWeight:"500"}} type="submit" className="btn btn-primary">Sign In <img style={{width:"24px",height:"24px"}} src={arrow} alt="" /></button>
 
 
             </div>
-            <p className='mt-4'>
-Not a member? <span><Link  style={{color:"#F47458"}}  to="/register">Singup now</Link></span>
-</p>
+          
         </form>
     </div>
 </div>

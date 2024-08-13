@@ -114,6 +114,39 @@ const Button = styled.button`
 `;
 
 const AddAdminPage = () => {
+
+
+  const [Data , setData] = useState({
+    name : '',
+    phone : '',
+    email : '',
+    isAdmin : 1,
+    roleIds : [],
+    tempRole : ''
+  })
+
+
+  const handleChange = (e) =>{
+    const {name , value} = e.target;
+    setData({
+      ...Data,
+      [name] : value,
+    })
+  }
+
+  const handleAddRoles = (e) =>{
+    const { value } =e.target;
+
+    roleIds.in
+
+
+
+    setData({
+      ...Data,
+      tempRole : ''
+    })
+  }
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [roles, setRoles] = useState({
@@ -148,12 +181,13 @@ const AddAdminPage = () => {
           <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Add Admin</h2>
           <Form onSubmit={handleSubmit}>
             <FormGroup>
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">Name</Label>
               <Input
+              name='name'
                 type="text"
                 id="username"
-                value={username}
-                onChange={handleUsernameChange}
+                value={Data.name}
+                onChange={handleChange}
                 placeholder="Enter username"
                 required
               />
@@ -161,15 +195,29 @@ const AddAdminPage = () => {
             <FormGroup>
               <Label htmlFor="email">Email</Label>
               <Input
+               name='email'
                 type="email"
                 id="email"
-                value={email}
-                onChange={handleEmailChange}
+                value={Data.email}
+                onChange={handleChange}
                 placeholder="Enter email address"
                 required
               />
             </FormGroup>
             <FormGroup>
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+               name='phone'
+                type="phone"
+                id="phone"
+                value={Data.phone}
+                onChange={handleChange}
+                placeholder="Enter email address"
+                required
+              />
+            </FormGroup>
+            <FormGroup>
+
               <Label>Roles</Label>
               <CheckboxGroup>
                 {Object.keys(roles).map(role => (
@@ -185,6 +233,7 @@ const AddAdminPage = () => {
                   </CheckboxContainer>
                 ))}
               </CheckboxGroup>
+
             </FormGroup>
             <Button type="submit">Add Admin</Button>
           </Form>
