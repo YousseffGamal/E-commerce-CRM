@@ -6,7 +6,7 @@ import Sidebar from "./component/sidebar/Sidebar";
 import AddProduct from "./Pages/addProducts/Add Products";
 // import Settings from "./Pages/Settings/Setting";
 import Orders from './Pages/orders/Orders';
-import ManageProducts  from './Pages/editAndDeleteProducts/Edit And Delete Products';
+import Products  from './Pages/Products/Products';
 import Reports  from './Pages/reports/Reports';
 import AddRole from "./Pages/AddRole/AddRole"; 
 import BrandPage from "./Pages/BrandPage/BrandPage"; 
@@ -35,7 +35,7 @@ const AppRouter = () => {
         <Route path="/addproduct" element={<AddProduct />} />
         {/* <Route path="/Settings" element={<Settings />} /> */}
         <Route path="/orders" element={<Orders />} />
-        <Route path="/manageproducts" element={<ManageProducts />} />
+        <Route path="/products" element={<Products />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/addrole" element={<AddRole />} />
         <Route path="/addbrand" element={<BrandPage />} />

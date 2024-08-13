@@ -115,16 +115,16 @@ const Sidebar = () => {
           <MenuText>Orders</MenuText>
         </StyledLink>
       </MenuItem>
-      <MenuItem>
+      {/* <MenuItem>
         <StyledLink to="/addproduct">
           <FiPlus />
           <MenuText>Add Products</MenuText>
         </StyledLink>
-      </MenuItem>
+      </MenuItem> */}
       <MenuItem>
-        <StyledLink to="/ManageProducts">
+        <StyledLink to="/products">
           <FaEdit />
-          <MenuText>Manage Products</MenuText>
+          <MenuText>Products</MenuText>
         </StyledLink>
       </MenuItem>
       <MenuItem>
