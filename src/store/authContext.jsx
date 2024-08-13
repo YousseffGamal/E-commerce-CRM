@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       console.log(data);
       
       // Extract permissions and other user data
-      const permissions = data.user.roles.flatMap((role) => role.permissions.map(permission => permission.name)) || []; 
+      const permissions = data?.user?.roles?.flatMap((role) => role.permissions.map(permission => permission.name)) || []; 
      
       setAuth({
         token: data.token,

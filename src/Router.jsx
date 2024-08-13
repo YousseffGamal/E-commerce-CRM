@@ -18,6 +18,7 @@ import Category from "./Pages/Category/Category"
 import Subcategory  from "./Pages/Subcategory/Subcategory"; 
 import Roles  from "./Pages/Roles/Roles"; 
 import ProtectedRoute from './utiliteis/protectedRoute';
+import Brand from './Pages/Brand/Brand';
 
 
 const AppRouter = () => {
@@ -37,7 +38,7 @@ const AppRouter = () => {
         <Route path="/manageproducts" element={<ManageProducts />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/addrole" element={<AddRole />} />
-        <Route path="/brandpage" element={<BrandPage />} />
+        <Route path="/addbrand" element={<BrandPage />} />
         <Route path="/addadmin" element={<AddAdmin />} />
         <Route path="/addcategory" element={<AddCategory />} />
         <Route path="/addsubcategory" element={<AddSubcategory />} />
@@ -45,6 +46,7 @@ const AppRouter = () => {
         <Route path="/category" element={<Category />} />
         <Route path="/subcategory" element={<Subcategory />} />
         <Route path="/roles" element={<Roles />} />
+        <Route path="/brand" element={<Brand />} />
 
 
 

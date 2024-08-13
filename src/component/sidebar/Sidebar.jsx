@@ -1,9 +1,10 @@
-// src/components/Sidebar/Sidebar.js
 import React from 'react';
 import styled from 'styled-components';
-import { FaHome, FaShoppingCart, FaChartBar, FaCog, FaEdit, FaUserPlus, FaTag, FaPlusCircle, FaUsers } from 'react-icons/fa';
+import { FaHome, FaShoppingCart, FaChartBar, FaCog, FaEdit, FaUserPlus, FaTag, FaUsers } from 'react-icons/fa';
 import { FiPlus } from 'react-icons/fi';
-import { Link ,useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axiosInstance from "../../axios";
+import { useAuth } from '../../store/authContext';
 
 const SidebarContainer = styled.div`
   width: 250px;
@@ -58,27 +59,46 @@ const StyledLink = styled(Link)`
   align-items: center;
   width: 100%;
 `;
-import axiosInstance from "../../axios";
-import { useAuth } from '../../store/authContext';
+
+const ButtonContainer = styled.div`
+  margin-top: auto; /* Pushes the buttons to the bottom */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const Button = styled.button`
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #ffffff;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${(props) => props.primary ? '#007bff' : '#dc3545'};
+
+  &:hover {
+    background-color: ${(props) => props.primary ? '#0056b3' : '#c82333'};
+  }
+`;
+
 const Sidebar = () => {
-
-
   const navigate = useNavigate();
-  const {logout} = useAuth()
+  const { logout } = useAuth();
 
-  const handleclick = async () =>{
-  const data= await axiosInstance.get('/getallusers')
-  console.log(data)
-  }
+  const handleclick = async () => {
+    const data = await axiosInstance.get('/getallusers');
+    console.log(data);
+  };
 
-
-
-
-  const handleLogOut = () =>{
-     logout()
-     navigate('/')
-   
-  }
+  const handleLogOut = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <SidebarContainer>
@@ -114,20 +134,20 @@ const Sidebar = () => {
         </StyledLink>
       </MenuItem>
       <MenuItem>
-        <StyledLink to="/brandpage">
+        <StyledLink to="/brand">
           <FaTag />
           <MenuText>Brand</MenuText>
         </StyledLink>
       </MenuItem>
-      <MenuItem>
+      {/* <MenuItem>
         <StyledLink to="/addadmin">
           <FaUserPlus />
           <MenuText>Add Admin</MenuText>
         </StyledLink>
-      </MenuItem>
+      </MenuItem> */}
       <MenuItem>
         <StyledLink to="/category">
-          <FaTag  />
+          <FaTag />
           <MenuText>Categorys</MenuText>
         </StyledLink>
       </MenuItem>
@@ -140,7 +160,7 @@ const Sidebar = () => {
       <MenuItem>
         <StyledLink to="/usersview">
           <FaUsers />
-          <MenuText>Users View</MenuText>
+          <MenuText>Admins</MenuText>
         </StyledLink>
       </MenuItem>
       <MenuItem>
@@ -149,18 +169,11 @@ const Sidebar = () => {
           <MenuText>Reports</MenuText>
         </StyledLink>
       </MenuItem>
-      {/* <MenuItem>
-        <StyledLink to="/settings">
-          <FaCog />
-          <MenuText>Settings</MenuText>
-        </StyledLink>
 
-      </MenuItem>
-      
-
-      </MenuItem> */}
-      <button onClick={handleLogOut}>logout</button>
-      <button onClick={handleclick}>test</button>
+      <ButtonContainer>
+        <Button onClick={handleLogOut}>Logout</Button>
+        <Button onClick={handleclick}>Test</Button>
+      </ButtonContainer>
     </SidebarContainer>
   );
 };

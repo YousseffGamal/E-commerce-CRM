@@ -119,65 +119,69 @@ const DeleteButton = styled.button`
   }
 `;
 
-const UsersViewPage = () => {
+const BrandsPage = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
-    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com' },
+  const [brands, setBrands] = useState([
+    { id: 1, title: 'Brand A', slug: 'brand-a', logo: 'logo-a.png' },
+    { id: 2, title: 'Brand B', slug: 'brand-b', logo: 'logo-b.png' },
   ]);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editUser, setEditUser] = useState(null);
+  const [editBrand, setEditBrand] = useState(null);
 
-  const handleEdit = (user) => {
-    setEditUser(user);
+  const handleEdit = (brand) => {
+    setEditBrand(brand);
     setShowEditModal(true);
   };
 
   const handleDelete = (id) => {
-    setUsers(users.filter(user => user.id !== id));
+    setBrands(brands.filter(brand => brand.id !== id));
   };
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
-    setEditUser(null);
+    setEditBrand(null);
   };
 
   const handleSaveEdit = () => {
-    setUsers(users.map(user =>
-      user.id === editUser.id ? editUser : user
+    setBrands(brands.map(brand =>
+      brand.id === editBrand.id ? editBrand : brand
     ));
     handleCloseEditModal();
   };
 
-  const handleAddUser = () => {
-    navigate('/addadmin');
+  const handleAddBrand = () => {
+    navigate('/addbrand');
   };
 
   return (
     <Container>
       <Sidebar />
       <Content>
-        <h2 style={{ marginBottom: '20px' }}>Admins</h2>
-        <AddButton onClick={handleAddUser}>Add Admin</AddButton>
+        <h2 style={{ marginBottom: '20px' }}>Brands</h2>
+        <AddButton onClick={handleAddBrand}>Add Brand</AddButton>
         <TableWrapper>
           <Table>
             <thead>
               <tr>
-                <TableHeader>ID</TableHeader>
-                <TableHeader>Name</TableHeader>
-                <TableHeader>Email</TableHeader>
+                <TableHeader>Brand ID</TableHeader>
+                <TableHeader>Title</TableHeader>
+                <TableHeader>Slug</TableHeader>
+                <TableHeader>Logo</TableHeader>
                 <TableHeader>Actions</TableHeader>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableData>{user.id}</TableData>
-                  <TableData>{user.name}</TableData>
-                  <TableData>{user.email}</TableData>
+              {brands.map((brand) => (
+                <TableRow key={brand.id}>
+                  <TableData>{brand.id}</TableData>
+                  <TableData>{brand.title}</TableData>
+                  <TableData>{brand.slug}</TableData>
                   <TableData>
-                    <EditButton onClick={() => handleEdit(user)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(user.id)}>Delete</DeleteButton>
+                    <img src={brand.logo} alt={brand.title} style={{ width: '50px', height: 'auto' }} />
+                  </TableData>
+                  <TableData>
+                    <EditButton onClick={() => handleEdit(brand)}>Edit</EditButton>
+                    <DeleteButton onClick={() => handleDelete(brand.id)}>Delete</DeleteButton>
                   </TableData>
                 </TableRow>
               ))}
@@ -185,29 +189,38 @@ const UsersViewPage = () => {
           </Table>
         </TableWrapper>
 
-        {/* Edit User Modal */}
+        {/* Edit Brand Modal */}
         <Modal show={showEditModal} onHide={handleCloseEditModal} animation={true}>
           <Modal.Header closeButton>
-            <Modal.Title>Edit User</Modal.Title>
+            <Modal.Title>Edit Brand</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
-              <Form.Group controlId="formUserName">
-                <Form.Label>Name</Form.Label>
+              <Form.Group controlId="formBrandTitle">
+                <Form.Label>Title</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter user name"
-                  value={editUser?.name || ''}
-                  onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
+                  placeholder="Enter brand title"
+                  value={editBrand?.title || ''}
+                  onChange={(e) => setEditBrand({ ...editBrand, title: e.target.value })}
                 />
               </Form.Group>
-              <Form.Group controlId="formUserEmail">
-                <Form.Label>Email</Form.Label>
+              <Form.Group controlId="formBrandSlug">
+                <Form.Label>Slug</Form.Label>
                 <Form.Control
-                  type="email"
-                  placeholder="Enter user email"
-                  value={editUser?.email || ''}
-                  onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                  type="text"
+                  placeholder="Enter brand slug"
+                  value={editBrand?.slug || ''}
+                  onChange={(e) => setEditBrand({ ...editBrand, slug: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formBrandLogo">
+                <Form.Label>Logo URL</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter logo URL"
+                  value={editBrand?.logo || ''}
+                  onChange={(e) => setEditBrand({ ...editBrand, logo: e.target.value })}
                 />
               </Form.Group>
             </Form>
@@ -226,4 +239,4 @@ const UsersViewPage = () => {
   );
 };
 
-export default UsersViewPage;
+export default BrandsPage;
