@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import axios from 'axios';
+import axiosInstance from '../../axios';
 const Container = styled.div`
   display: flex;
   height: auto;
@@ -110,31 +111,72 @@ const ProductImage = styled.img`
   border-radius: 10px;
 `;
 
-const AddProductForm = ({ onAdd }) => {
-  const [name, setName] = useState('');
+const AddProductForm = () => {
+  const [title, settitle] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState('default');
+  const [categories, setCategories] = useState([]);
   const [size, setSize] = useState('');
   const [color, setColor] = useState('');
   const [stockQuantity, setStockQuantity] = useState('');
   const [sku, setSku] = useState('');
-  const [brand, setBrand] = useState('');
+  const [brand, setBrand] = useState('default');
+  const [brands, setBrands] = useState([]);
   const [material, setMaterial] = useState('');
   const [discountPrice, setDiscountPrice] = useState('');
   const [isFormActive, setIsFormActive] = useState(false);
 
+
+  const sendProduct = async (newProduct) => {
+    try {
+      
+      const response = await axiosInstance.post('/addproduct', newProduct );
+      console.log('API response:', response.data);
+      // Handle success if needed
+    } catch (error) {
+      console.error('Error submitting the product:', error);
+      // Handle error if needed
+    }
+  };
+
   useEffect(() => {
-    const allFieldsEmpty = !name && !price && !description && !imagePreview;
+    const allFieldsEmpty = !title && !price && !description && !imagePreview;
     setIsFormActive(!allFieldsEmpty);
-  }, [name, price, description, imagePreview]);
+  }, [title, price, description, imagePreview]);
+
+useEffect(()=>{
+  const fetchCategory = async()=>{
+    try{
+      const response = await axiosInstance.get('/getallcategories')
+      setCategories(response.data.allCategories)
+      
+    }catch (error) {
+      console.error('Error submitting the category:', error);
+    }} 
+  fetchCategory()  
+},[])
+
+useEffect(()=>{
+  const fetchBrand = async()=>{
+    try{
+      const response = await axiosInstance.get('/getallbrands')
+      setBrands(response.data.allBrands)
+      console.log(response.data.allBrands)
+      
+    }catch (error) {
+      console.error('Error submitting the brand:', error);
+    }} 
+  fetchBrand()  
+},[])
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const newProduct = {
-      name,
+      title,
       price,
       description,
       image,
@@ -142,13 +184,19 @@ const AddProductForm = ({ onAdd }) => {
       size,
       color,
       stockQuantity,
-      sku,
       brand,
       material,
       discountPrice,
     };
-    onAdd(newProduct);
-    setName('');
+
+
+     sendProduct(newProduct);
+    // Log the object to the console
+    console.log(newProduct);
+
+
+    // Clear form fields
+    settitle('');
     setPrice('');
     setDescription('');
     setImage(null);
@@ -180,18 +228,18 @@ const AddProductForm = ({ onAdd }) => {
   return (
     <Container>
       <Sidebar />
-      <div className='rrr' style={{ display: 'flex', width: '100%', padding: '20px' }}>
+      <div classtitle='rrr' style={{ display: 'flex', width: '100%', padding: '20px' }}>
         <StyledFormContainer isFormActive={isFormActive}>
           <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Add Product</h2>
           <Form onSubmit={handleSubmit}>
             <FormGroup>
-              <Label htmlFor="name">Product Name</Label>
+              <Label htmlFor="title">Product title</Label>
               <Input
                 type="text"
-                id="name"
-                value={name}
-                onChange={(e) => handleInputChange(e, setName)}
-                placeholder="Enter product name"
+                id="title"
+                value={title}
+                onChange={(e) => handleInputChange(e, settitle)}
+                placeholder="Enter product title"
                 required
               />
             </FormGroup>
@@ -219,11 +267,12 @@ const AddProductForm = ({ onAdd }) => {
             </FormGroup>
             <FormGroup>
               <Label htmlFor="category">Category</Label>
+              
               <Select id="category" value={category} onChange={(e) => handleInputChange(e, setCategory)} required>
-                <option value="">Select category</option>
-                <option value="Men">Men</option>
-                <option value="Women">Women</option>
-                <option value="Kids">Kids</option>
+                <option value="default" disabled >Select category</option>
+                {categories.map((cat)=>(
+                <option value={cat._id}>{cat.title}</option>
+              ))}
               </Select>
             </FormGroup>
             <FormGroup>
@@ -260,26 +309,22 @@ const AddProductForm = ({ onAdd }) => {
               />
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="sku">SKU</Label>
-              <Input
-                type="text"
-                id="sku"
-                value={sku}
-                onChange={(e) => handleInputChange(e, setSku)}
-                placeholder="Enter SKU"
-                required
-              />
-            </FormGroup>
-            <FormGroup>
               <Label htmlFor="brand">Brand</Label>
-              <Input
+
+              <Select id="brand" value={brand} onChange={(e) => handleInputChange(e, setBrand)} required>
+                <option value="default" disabled >Select brand</option>
+                {brands.map((bran)=>(
+                <option value={bran._id}>{bran.title}</option>
+              ))}
+              </Select>
+              {/* <Input
                 type="text"
                 id="brand"
                 value={brand}
                 onChange={(e) => handleInputChange(e, setBrand)}
-                placeholder="Enter brand name"
+                placeholder="Enter brand title"
                 required
-              />
+              /> */}
             </FormGroup>
             <FormGroup>
               <Label htmlFor="material">Material</Label>
@@ -303,44 +348,14 @@ const AddProductForm = ({ onAdd }) => {
               />
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="image">Upload Image</Label>
-              <Input
-                type="file"
-                id="image"
-                accept="image/*"
-                onChange={(e) => {
-                  handleInputChange(e, setImage);
-                  handleImageChange(e);
-                }}
-                required
-              />
+              <Label htmlFor="image">Product Image</Label>
+              <Input type="file" id="image" onChange={handleImageChange} required />
             </FormGroup>
+            {imagePreview && <ProductImage src={imagePreview} alt="Product Preview" />}
             <Button type="submit">Add Product</Button>
           </Form>
         </StyledFormContainer>
-        {isFormActive && (
-          <PreviewContainer className='asd'>
-            <div className="row">
-              <div className="col-md">
-                {imagePreview && <ProductImage style={{height:"100%",maxHeight:"617px",maxWidth:"475px",width:"100%"}} src={imagePreview} alt="Product Preview" />}
-              </div>
-              <div className="col-md">
-                <h2 style={{marginBottom:"40px",fontWeight:"bold"}}>Product Preview</h2>
-                <p style={{fontSize:"1.875rem",fontWeight:"bold",lineHeight:"2.25rem"}}> {name}</p>
-                <p style={{fontSize:"0.899rem",opacity:"0.8"}}> {description}</p>
-                <p style={{fontSize:"36px",fontWeight:"bold"}}> {price} $</p>
-                <p style={{fontSize:"0.875rem",fontWeight:"bold"}}>Category: {category}</p>
-                <p style={{fontSize:"0.875rem",fontWeight:"bold"}}>Size: {size}</p>
-                <p style={{fontSize:"0.875rem",fontWeight:"bold"}}>Color: {color}</p>
-                <p style={{fontSize:"0.875rem",fontWeight:"bold"}}>Stock: {stockQuantity}</p>
-                <p style={{fontSize:"0.875rem",fontWeight:"bold"}}>SKU: {sku}</p>
-                <p style={{fontSize:"0.875rem",fontWeight:"bold"}}>Brand: {brand}</p>
-                <p style={{fontSize:"0.875rem",fontWeight:"bold"}}>Material: {material}</p>
-                <p style={{fontSize:"0.875rem",fontWeight:"bold"}}>Discount Price: {discountPrice} $</p>
-              </div>
-            </div>
-          </PreviewContainer>
-        )}
+        <PreviewContainer></PreviewContainer>
       </div>
     </Container>
   );
