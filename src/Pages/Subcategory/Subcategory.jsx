@@ -4,6 +4,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -128,46 +129,96 @@ const SubcategoriesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    // Fetch subcategories and categories from API or static data
-    setSubcategories([
-      { id: 1, title: 'Subcategory 1', category: 'Electronics' },
-      { id: 2, title: 'Subcategory 2', category: 'Books' },
-    ]);
+  // useEffect(() => {
+  //   // Fetch subcategories and categories from API or static data
+  //   setSubcategories([
+  //     { id: 1, title: 'Subcategory 1', category: 'Electronics' },
+  //     { id: 2, title: 'Subcategory 2', category: 'Books' },
+  //   ]);
     
-    setCategories([
-      { id: 1, name: 'Electronics' },
-      { id: 2, name: 'Books' },
-      { id: 3, name: 'Clothing' },
-    ]);
-  }, []);
+  //   setCategories([
+  //     { id: 1, name: 'Electronics' },
+  //     { id: 2, name: 'Books' },
+  //     { id: 3, name: 'Clothing' },
+  //   ]);
+  // }, []);
 
   const handleEdit = (subcategory) => {
+    console.log(subcategory)
+    getCategories()
     setEditSubcategory(subcategory);
     setTitle(subcategory.title);
-    setSelectedCategory(subcategory.category);
+    setSelectedCategory(subcategory.category._id);
     setShowEditModal(true);
   };
 
   const handleDelete = (id) => {
-    setSubcategories(subcategories.filter(sub => sub.id !== id));
+    if(confirm('Are you sure you want to delete that ?')){
+      axiosInstance.delete(`/deletesubcategory/${id}` )
+      .then((res) =>{
+        console.log(res.data)
+        setSubcategories(subcategories.filter(sub => sub._id !== id));
+      
+      })
+      .catch((err) =>{
+        alert(`Faild to delete category ${err.response.data.message}`)
+        console.log(err)
+      })
+      
+    }
+  
   };
 
   const handleCloseEditModal = () => {
+    getSubCategories()
     setShowEditModal(false);
     setEditSubcategory(null);
   };
-
+``
   const handleSaveEdit = () => {
-    const updatedSubcategories = subcategories.map(sub => 
-      sub.id === editSubcategory.id ? { ...editSubcategory, title, category: selectedCategory } : sub
-    );
-    setSubcategories(updatedSubcategories);
-    handleCloseEditModal();
+    axiosInstance.patch(`/updatesubcategory/${editSubcategory._id}`,{ title , category: selectedCategory} )
+    .then((res) =>{
+      handleCloseEditModal();
+     console.log(res.data)
+    })
+    .catch((err) =>{
+      alert(`Faild to add category ${err.response.data.message}`)
+      console.log(err)
+    })
+   
   };
 
   const handleTitleChange = (e) => setTitle(e.target.value);
   const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
+  const getCategories = () =>{
+    axiosInstance.get('getallcategories')
+    .then((res) =>{
+      setCategories(res.data.allCategories)
+     console.log(res.data.allCategories)
+    })
+    .catch((err) =>{
+      // alert(`Faild to add category ${err.response.data.message}`)
+      console.log(err)
+    })
+  }
+  const getSubCategories = () =>{
+    axiosInstance.get('getallsubcategories')
+    .then((res) =>{
+      setSubcategories(res.data.allSubCategories)
+     console.log(res.data.allSubCategories)
+    })
+    .catch((err) =>{
+      // alert(`Faild to add category ${err.response.data.message}`)
+      console.log(err)
+    })
+  }
+  useEffect(() =>{
+    getSubCategories()
+  },[])
+  
+
+
+
 
   return (
     <Container>
@@ -186,14 +237,14 @@ const SubcategoriesPage = () => {
               </tr>
             </thead>
             <tbody>
-              {subcategories.map((subcategory) => (
-                <TableRow key={subcategory.id}>
-                  <TableData>{subcategory.id}</TableData>
+              {subcategories.map((subcategory,index) => (
+                <TableRow key={subcategory._id}>
+                  <TableData >{index+1}</TableData>
                   <TableData>{subcategory.title}</TableData>
-                  <TableData>{subcategory.category}</TableData>
+                  <TableData>{subcategory.category.title}</TableData>
                   <TableData>
                     <EditButton onClick={() => handleEdit(subcategory)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(subcategory.id)}>Delete</DeleteButton>
+                    <DeleteButton onClick={() => handleDelete(subcategory._id)}>Delete</DeleteButton>
                   </TableData>
                 </TableRow>
               ))}
@@ -226,8 +277,8 @@ const SubcategoriesPage = () => {
                 >
                   <option value="">Select a category</option>
                   {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
+                    <option key={category._id} value={category._id}>
+                      {category.title}
                     </option>
                   ))}
                 </Form.Control>

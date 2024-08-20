@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -129,32 +130,37 @@ const Button = styled.button`
 
 const AddBrandPage = () => {
   const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [logo, setLogo] = useState(null);
+  const [image, setImage] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
-
+  const [error, setError] = useState('');
   const handleTitleChange = (e) => setTitle(e.target.value);
-  const handleSlugChange = (e) => setSlug(e.target.value);
 
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
-    setLogo(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setLogoPreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    setImage(file);
+    setLogoPreview(URL.createObjectURL(file)); // Create preview
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newBrand = {
-      title,
-      slug,
-      logo,
-    };
-    console.log('New Brand:', newBrand);
-    // Add functionality to handle form submission
+    if (!image) {
+      setError('Please upload an image.');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', image);
+    formData.append('title', title);
+
+    axiosInstance.post('/addbrand', formData)
+      .then((res) => {
+        console.log(res.data);
+        setTitle('');
+        setImage(null);
+        setLogoPreview(null);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   return (
@@ -176,17 +182,6 @@ const AddBrandPage = () => {
               />
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="slug">Slug</Label>
-              <Input
-                type="text"
-                id="slug"
-                value={slug}
-                onChange={handleSlugChange}
-                placeholder="Enter brand slug"
-                required
-              />
-            </FormGroup>
-            <FormGroup>
               <Label htmlFor="logo">Logo</Label>
               <FileInputWrapper>
                 <FileInputLabel htmlFor="logo">
@@ -197,13 +192,15 @@ const AddBrandPage = () => {
                   )}
                 </FileInputLabel>
                 <FileInput
-                  id="logo"
+                name='image'
+                  id="image"
                   accept="image/*"
                   onChange={handleLogoChange}
                   required
                 />
               </FileInputWrapper>
             </FormGroup>
+            {error}
             <Button type="submit">Add Brand</Button>
           </Form>
         </FormContainer>

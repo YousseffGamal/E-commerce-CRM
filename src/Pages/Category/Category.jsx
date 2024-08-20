@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -121,10 +122,7 @@ const DeleteButton = styled.button`
 
 const CategoriesPage = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([
-    { id: 1, title: 'Category 1' },
-    { id: 2, title: 'Category 2' },
-  ]);
+  const [categories, setCategories] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
 
@@ -134,25 +132,55 @@ const CategoriesPage = () => {
   };
 
   const handleDelete = (id) => {
-    setCategories(categories.filter(cat => cat.id !== id));
+    if(confirm('Are you sure you want to delete this category')){
+      axiosInstance.delete(`/deletecategory/${id}`)
+      .then((res) =>{
+        setCategories(categories.filter(cat => cat._id !== id));
+     })
+     .catch((err) =>{
+      alert('failed to Delete cat')
+       console.log(err)
+     })
+    }
+   
+   
+   
   };
 
   const handleCloseEditModal = () => {
+    getAllCat()
     setShowEditModal(false);
     setEditCategory(null);
   };
 
   const handleSaveEdit = () => {
-    setCategories(categories.map(cat =>
-      cat.id === editCategory.id ? editCategory : cat
-    ));
-    handleCloseEditModal();
+    axiosInstance.patch(`/updatecategory/${editCategory._id}`,editCategory)
+    .then((res) =>{
+      handleCloseEditModal();
+   })
+   .catch((err) =>{
+    alert('faild to add cat')
+     console.log(err)
+   })
+ 
   };
 
   const handleAddCategory = () => {
     navigate('/addcategory');
   };
-
+  const getAllCat = () =>{
+    axiosInstance.get('/getallcategories')
+    .then((res) =>{
+       setCategories(res.data.allCategories)
+    })
+    .catch((err) =>{
+     
+      console.log(err)
+    })
+  }
+  useEffect(() =>{
+    getAllCat()
+  },[])
   return (
     <Container>
       <Sidebar />
@@ -169,13 +197,13 @@ const CategoriesPage = () => {
               </tr>
             </thead>
             <tbody>
-              {categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableData>{category.id}</TableData>
-                  <TableData>{category.title}</TableData>
+              {categories?.map((category,index) => (
+                <TableRow key={category._id}>
+                  <TableData id={category._id}>{index+1}</TableData>
+                  <TableData id={category._id}>{category.title}</TableData>
                   <TableData>
                     <EditButton onClick={() => handleEdit(category)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(category.id)}>Delete</DeleteButton>
+                    <DeleteButton onClick={() => handleDelete(category._id)}>Delete</DeleteButton>
                   </TableData>
                 </TableRow>
               ))}

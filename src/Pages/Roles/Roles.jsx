@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -121,16 +122,17 @@ const DeleteButton = styled.button`
 
 const RolesPage = () => {
   const navigate = useNavigate();
-  const [roles, setRoles] = useState([
-    { id: 1, name: 'Admin', permissions: ['View', 'Edit', 'Delete'] },
-    { id: 2, name: 'Manager', permissions: ['View', 'Edit'] },
-    { id: 3, name: 'Employee', permissions: ['View'] },
-    { id: 4, name: 'Guest', permissions: [] },
-  ]);
+  const [roles, setRoles] = useState([]);
+  const [permissions , setPermissions] = useState([])
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editRole, setEditRole] = useState(null);
+  const [editRole, setEditRole] = useState([]);
+  const [editpermissions, setEditPermissions] =useState([])
+
 
   const handleEdit = (role) => {
+    console.log(role)
+    setEditPermissions(role.permissions.map(per => per._id))
+    getAllPermissions()
     setEditRole(role);
     setShowEditModal(true);
   };
@@ -140,21 +142,66 @@ const RolesPage = () => {
   };
 
   const handleCloseEditModal = () => {
+    
     setShowEditModal(false);
-    setEditRole(null);
+    setEditRole([]);
+    setEditPermissions([]);
+    getAllRoles()
+
   };
 
   const handleSaveEdit = () => {
-    setRoles(roles.map(role =>
-      role.id === editRole.id ? editRole : role
-    ));
-    handleCloseEditModal();
+    console.log(editpermissions)
+    axiosInstance.patch(`/updateRoles/${editRole._id}`, { name :editRole.name , permissionsIds : editpermissions})
+    .then((res) =>{
+      console.log(res.data)
+      handleCloseEditModal();
+    })
+    .catch((err) =>{
+      console.log(err)
+    })
+   
   };
 
   const handleAddRole = () => {
     navigate('/addrole');
   };
 
+  const handleChangeForTheCheckBox =  (e) => {
+    const { value , checked} = e.target;
+    if(checked){
+      setEditPermissions([...editpermissions,value])
+    }else {
+      setEditPermissions([...editpermissions.filter(per => per != value)])
+    }
+    
+  }
+//calls to the data base to get roles and permissions
+const getAllRoles =() =>{
+  axiosInstance.get('/allRoles')
+      .then((res) =>{
+        setRoles(res.data.roles)
+        console.log(res.data.roles)
+      })
+      .catch((err) =>{
+        console.log(err)
+      })
+}
+  useEffect(() =>{
+    getAllRoles()
+  },[])
+const getAllPermissions = () =>{
+  axiosInstance.get('/allPermissions')
+  .then((res) =>{
+    console.log(res.data)
+    setPermissions(res.data)
+  })
+  .catch((err) =>{
+    console.log(err)
+  })
+
+}
+ 
   return (
     <Container>
       <Sidebar />
@@ -172,14 +219,14 @@ const RolesPage = () => {
               </tr>
             </thead>
             <tbody>
-              {roles.map((role) => (
-                <TableRow key={role.id}>
-                  <TableData>{role.id}</TableData>
+              {roles.map((role,index) => (
+                <TableRow key={role._id}>
+                  <TableData>{index+1}</TableData>
                   <TableData>{role.name}</TableData>
-                  <TableData>{role.permissions.join(', ')}</TableData>
+                  <TableData>{role.permissions.map( per => per.name ).join(' / ')}</TableData>
                   <TableData>
                     <EditButton onClick={() => handleEdit(role)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(role.id)}>Delete</DeleteButton>
+                    {/* <DeleteButton onClick={() => handleDelete(role.id)}>Delete</DeleteButton> */}
                   </TableData>
                 </TableRow>
               ))}
@@ -194,6 +241,7 @@ const RolesPage = () => {
           </Modal.Header>
           <Modal.Body>
             <Form>
+           
               <Form.Group controlId="formRoleName">
                 <Form.Label>Role Name</Form.Label>
                 <Form.Control
@@ -203,14 +251,21 @@ const RolesPage = () => {
                   onChange={(e) => setEditRole({ ...editRole, name: e.target.value })}
                 />
               </Form.Group>
+
               <Form.Group controlId="formPermissions">
                 <Form.Label>Permissions</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  value={editRole?.permissions.join(', ') || ''}
-                  onChange={(e) => setEditRole({ ...editRole, permissions: e.target.value.split(',').map(p => p.trim()) })}
+              {  permissions.map((per) => (
+                  <Form.Check // prettier-ignore
+                  checked={editpermissions.includes(per._id)}
+                  key={per._id}
+                  id={per.name}
+                  value={per._id}
+                  type='checkbox'
+                  label={per.name}
+                  onChange={handleChangeForTheCheckBox}
                 />
+              ))  }
+             
               </Form.Group>
             </Form>
           </Modal.Body>

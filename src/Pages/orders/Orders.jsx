@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Sidebar from '../../component/sidebar/Sidebar';
 import styled from 'styled-components';
 import { Modal, Button, Form } from 'react-bootstrap';
+import axios, { Axios } from 'axios';
+import axiosInstance from '../../axios';
 
 const AppContainer = styled.div`
   display: flex;
@@ -57,49 +59,72 @@ const Table = styled.table`
 const Orders = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [status, setStatus] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState([]);
+  const [statusIDs, setStatusIDs] = useState([]);
 
-  const orders = [
-    { id: 1, customer: 'John Doe', product: 'T-Shirt', quantity: 2, total: 40 },
-    { id: 2, customer: 'Jane Smith', product: 'Jeans', quantity: 1, total: 40 },
-    { id: 3, customer: 'Alice Johnson', product: 'Jacket', quantity: 1, total: 60 },
-    { id: 4, customer: 'Bob Brown', product: 'Hat', quantity: 3, total: 30 },
-    { id: 5, customer: 'Charlie Davis', product: 'Shoes', quantity: 2, total: 80 },
-    { id: 6, customer: 'Diana Evans', product: 'Scarf', quantity: 1, total: 20 },
-    { id: 7, customer: 'Eve Foster', product: 'Socks', quantity: 5, total: 25 },
-    { id: 8, customer: 'Frank Green', product: 'Sweater', quantity: 1, total: 45 },
-    { id: 9, customer: 'Grace Harris', product: 'T-Shirt', quantity: 4, total: 80 },
-    { id: 10, customer: 'Henry Irving', product: 'Jeans', quantity: 2, total: 80 },
-    { id: 11, customer: 'Ivy Jackson', product: 'Belt', quantity: 1, total: 15 },
-    { id: 12, customer: 'Jack Kelly', product: 'Shirt', quantity: 3, total: 75 },
-    { id: 13, customer: 'Karen Lewis', product: 'Skirt', quantity: 2, total: 50 },
-    { id: 14, customer: 'Larry Moore', product: 'Shorts', quantity: 2, total: 35 },
-    { id: 15, customer: 'Mona Nash', product: 'Dress', quantity: 1, total: 45 },
-    { id: 16, customer: 'Nancy Owens', product: 'Coat', quantity: 1, total: 100 },
-    { id: 17, customer: 'Oliver Peters', product: 'Gloves', quantity: 2, total: 25 },
-    { id: 18, customer: 'Paula Quinn', product: 'Cap', quantity: 2, total: 20 },
-    { id: 19, customer: 'Quincy Rogers', product: 'Sunglasses', quantity: 1, total: 50 },
-    { id: 20, customer: 'Rachel Scott', product: 'Sandals', quantity: 2, total: 40 },
-  ];
-
-  const handleCancelOrder = (orderId) => {
-    // Implement cancel order logic here
-    console.log(`Cancel order with ID: ${orderId}`);
+  const getOrderStatus = () => {
+    axiosInstance.get('orderStatus')
+      .then((res) => {
+        console.log(res.data);
+        setStatus(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
+  const getAllOrders = () => {
+    const query = statusIDs.length ? `/orders?statusIDs=${statusIDs.join(',')}` : '/orders';
+    axiosInstance.get(query)
+      .then((res) => {
+        console.log(res.data);
+        setOrders(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    getOrderStatus();
+    getAllOrders();
+  }, []);
+
+  useEffect(() => {
+    getAllOrders();
+  }, [statusIDs]); // Trigger fetching orders when statusIDs changes
+
   const handleUpdateOrder = (order) => {
+    getOrderStatus();
     setSelectedOrder(order);
+    setSelectedStatus(order.status._id);
     setShowModal(true);
   };
 
   const handleModalClose = () => {
     setShowModal(false);
     setSelectedOrder(null);
+    getAllOrders(); // Refresh orders after closing modal
   };
 
-  const handleModalSave = () => {
-    // Implement save logic here
-    console.log(`Update order with ID: ${selectedOrder.id}`);
-    handleModalClose();
+  const handleModalSave = async () => {
+    axiosInstance.patch(`orders/${selectedOrder._id}`, { status: selectedStatus })
+      .then((res) => {
+        console.log(res.data);
+        handleModalClose();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleAddFilters = (e) => {
+    const { value, checked } = e.target;
+    setStatusIDs(prevIDs =>
+      checked ? [...prevIDs, value] : prevIDs.filter(id => id !== value)
+    );
   };
 
   return (
@@ -107,6 +132,28 @@ const Orders = () => {
       <Sidebar />
       <Content>
         <h1>Orders</h1>
+        <h5>Filers</h5>
+       
+         <div className="boxCheckBox">
+
+        {
+          
+          status.map((stat,index) => (
+          <div>
+                <input type="checkbox" id={stat._id}  key={stat._id} name={stat.name}
+                        value={stat._id} 
+            // checked={Data.roleIds.includes(role._id)}
+            onChange={handleAddFilters}
+            />
+             <span  key={index}>  {stat.name}</span>
+            </div>
+            
+          ))
+        } 
+        
+     
+        </div>
+       
         <div className="table-responsive">
           <Table className="table table-striped">
             <thead>
@@ -116,23 +163,34 @@ const Orders = () => {
                 <th>Product</th>
                 <th>Quantity</th>
                 <th>Total</th>
+                <th>Discount</th>
+                <th>Total Price After Discount</th>
+                <th>Payment Method</th>
+                <th>Shipping address</th>
+                <th>ٍStatus</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr key={order.id}>
-                  <td>{order.id}</td>
-                  <td>{order.customer}</td>
-                  <td>{order.product}</td>
-                  <td>{order.quantity}</td>
-                  <td>${order.total}</td>
+              {orders?.map((order,index) => (
+                <tr key={order._id}>
+                  <td>{index +1}</td>
+                  <td>{order.user.name}</td>
                   <td>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleCancelOrder(order.id)}>
-                      Cancel
-                    </button>
+                    {order.cartItems.map(item => (
+                      <div key={item.productId._id}>{item.productId.title}</div>
+                    ))}
+                  </td>
+                  <td>{order.cartItems.reduce((total, item) => total + item.quantity, 0)}</td>
+                  <td>${order.totalOrderPrice}</td>
+                  <td>{order.discount}%</td>
+                  <td>${order.totalOrderPriceAfterDiscount}</td>
+                  <td>{order.paymentMethod}</td>
+                  <td>{order.shippingAddress}</td>
+                  <td>{order.status.name}</td>
+                  <td>
                     <button className="btn btn-primary btn-sm" onClick={() => handleUpdateOrder(order)}>
-                      Update
+                      Update Status
                     </button>
                   </td>
                 </tr>
@@ -148,30 +206,114 @@ const Orders = () => {
           <Modal.Title>Update Order</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedOrder && (
+        <Form.Group controlId="formSubcategoryCategory">
+                <Form.Label>Category</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                >
+                  <option value="">Select a category</option>
+                  {status?.map((stat) => (
+                    <option key={stat._id} value={stat._id}>
+                      {stat.name}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
+
+
+
+
+          {/* {selectedOrder && (
             <Form>
               <Form.Group controlId="formOrderId">
                 <Form.Label>Order ID</Form.Label>
-                <Form.Control type="text" readOnly value={selectedOrder.id} />
+                <Form.Control type="text" readOnly value={selectedOrder._id} />
               </Form.Group>
               <Form.Group controlId="formCustomerName">
                 <Form.Label>Customer</Form.Label>
-                <Form.Control type="text" value={selectedOrder.customer} />
+                <Form.Control type="text" value={selectedOrder.user.name} onChange={(e) => setSelectedOrder({ ...selectedOrder, user: { ...selectedOrder.user, name: e.target.value } })} />
               </Form.Group>
-              <Form.Group controlId="formProduct">
-                <Form.Label>Product</Form.Label>
-                <Form.Control type="text" value={selectedOrder.product} />
+              <Form.Group controlId="formProducts">
+                <Form.Label>Products</Form.Label>
+                {selectedOrder?.cartItems.map((item, index) => (
+                  <div key={index} className="mb-3">
+                    <Form.Control
+                      type="text"
+                      value={item.productId.title}
+                      readOnly
+                    />
+                     <Form.Control
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => {
+                        const newCartItems = [...selectedOrder.cartItems];
+                        newCartItems[index].quantity = parseInt(e.target.value, 10);
+                        setSelectedOrder({ ...selectedOrder, cartItems: newCartItems });
+                      }}
+                    /> 
+                  </div>
+                ))}
               </Form.Group>
-              <Form.Group controlId="formQuantity">
-                <Form.Label>Quantity</Form.Label>
-                <Form.Control type="number" value={selectedOrder.quantity} />
+              <Form.Group controlId="formTotalPrice">
+                <Form.Label>Total Price</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={selectedOrder.totalOrderPrice}
+                 onChange={(e) => setSelectedOrder({ ...selectedOrder, totalOrderPrice: parseFloat(e.target.value) })}
+                />
               </Form.Group>
-              <Form.Group controlId="formTotal">
-                <Form.Label>Total</Form.Label>
-                <Form.Control type="number" value={selectedOrder.total} />
+              <Form.Group controlId="formDiscount">
+                <Form.Label>Discount</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={selectedOrder.discount}
+                  onChange={(e) => setSelectedOrder({ ...selectedOrder, discount: parseFloat(e.target.value) })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formTotalPriceAfterDiscount">
+                <Form.Label>Total Price After Discount</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={selectedOrder.totalOrderPriceAfterDiscount}
+                 onChange={(e) => setSelectedOrder({ ...selectedOrder, totalOrderPriceAfterDiscount: parseFloat(e.target.value) })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formPaymentMethod">
+                <Form.Label>Payment Method</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={selectedOrder.paymentMethod}
+                  onChange={(e) => setSelectedOrder({ ...selectedOrder, paymentMethod: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formShippingAddress">
+                <Form.Label>Shipping Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={selectedOrder.shippingAddress}
+                  onChange={(e) => setSelectedOrder({ ...selectedOrder, shippingAddress: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formIsPaid">
+                <Form.Check
+                  type="checkbox"
+                  label="Paid"
+                  checked={selectedOrder.isPaid}
+                  onChange={(e) => setSelectedOrder({ ...selectedOrder, isPaid: e.target.checked })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formIsDelivered">
+                <Form.Check
+                  type="checkbox"
+                  label="Delivered"
+                  checked={selectedOrder.isDelivered}
+                  onChange={(e) => setSelectedOrder({ ...selectedOrder, isDelivered: e.target.checked })}
+                />
               </Form.Group>
             </Form>
-          )}
+          )} */}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleModalClose}>

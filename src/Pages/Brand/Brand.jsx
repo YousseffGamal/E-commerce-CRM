@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -121,12 +122,9 @@ const DeleteButton = styled.button`
 
 const BrandsPage = () => {
   const navigate = useNavigate();
-  const [brands, setBrands] = useState([
-    { id: 1, title: 'Brand A', slug: 'brand-a', logo: 'logo-a.png' },
-    { id: 2, title: 'Brand B', slug: 'brand-b', logo: 'logo-b.png' },
-  ]);
+  const [brands, setBrands] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editBrand, setEditBrand] = useState(null);
+  const [editBrand, setEditBrand] = useState({});
 
   const handleEdit = (brand) => {
     setEditBrand(brand);
@@ -134,28 +132,76 @@ const BrandsPage = () => {
   };
 
   const handleDelete = (id) => {
-    setBrands(brands.filter(brand => brand.id !== id));
+    axiosInstance.delete(`/deletebrand/${id}`)
+    .then((res) => {
+      console.log(res.data)
+      setBrands(brands.filter(brand => brand._id !== id));
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+
+    
   };
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setEditBrand(null);
+    getAllBrands()
   };
+  
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    setEditBrand({
+      ...editBrand,
+      file : file
+    })
+   
 
+  };
   const handleSaveEdit = () => {
-    setBrands(brands.map(brand =>
-      brand.id === editBrand.id ? editBrand : brand
-    ));
-    handleCloseEditModal();
+    delete editBrand.image
+    delete editBrand.slug
+    delete editBrand.createdAt
+    delete editBrand.updatedAt
+
+    const formData = new FormData();
+    formData.append('file', editBrand.file);
+    formData.append('title', editBrand.title);
+    axiosInstance.patch(`updatebrand/${editBrand._id}`,formData )
+    .then((res) => {
+      console.log(res.data);
+      handleCloseEditModal();
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+   
   };
 
   const handleAddBrand = () => {
     navigate('/addbrand');
   };
+  const getAllBrands = () =>{
+    axiosInstance.get('getallbrands')
+    .then((res) => {
+        console.log(res.data.allBrands);
+        setBrands(res.data.allBrands)
+      })
+      .catch((err) => {
+        console.error(err);
+      });
 
+
+  }
+
+ 
+  useEffect(() =>{
+    getAllBrands()
+  },[])
   return (
-    <Container>
-      <Sidebar />
+     <Container>
+   <Sidebar />
       <Content>
         <h2 style={{ marginBottom: '20px' }}>Brands</h2>
         <AddButton onClick={handleAddBrand}>Add Brand</AddButton>
@@ -165,25 +211,25 @@ const BrandsPage = () => {
               <tr>
                 <TableHeader>Brand ID</TableHeader>
                 <TableHeader>Title</TableHeader>
-                <TableHeader>Slug</TableHeader>
                 <TableHeader>Logo</TableHeader>
                 <TableHeader>Actions</TableHeader>
               </tr>
             </thead>
             <tbody>
-              {brands.map((brand) => (
-                <TableRow key={brand.id}>
-                  <TableData>{brand.id}</TableData>
+              {brands?.map((brand,index) => (
+           
+                <TableRow key={brand._id}>
+                  <TableData>{index + 1}</TableData>
                   <TableData>{brand.title}</TableData>
-                  <TableData>{brand.slug}</TableData>
                   <TableData>
-                    <img src={brand.logo} alt={brand.title} style={{ width: '50px', height: 'auto' }} />
+                    <img src={`http://localhost:3000/uploads/${brand.image.replace('\\', '/')}`} alt={brand.title} style={{ width: '50px', height: 'auto' }} />
                   </TableData>
                   <TableData>
                     <EditButton onClick={() => handleEdit(brand)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(brand.id)}>Delete</DeleteButton>
+                    <DeleteButton onClick={() => handleDelete(brand._id)}>Delete</DeleteButton>
                   </TableData>
                 </TableRow>
+                    
               ))}
             </tbody>
           </Table>
@@ -205,23 +251,22 @@ const BrandsPage = () => {
                   onChange={(e) => setEditBrand({ ...editBrand, title: e.target.value })}
                 />
               </Form.Group>
-              <Form.Group controlId="formBrandSlug">
-                <Form.Label>Slug</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter brand slug"
-                  value={editBrand?.slug || ''}
-                  onChange={(e) => setEditBrand({ ...editBrand, slug: e.target.value })}
-                />
-              </Form.Group>
+              
               <Form.Group controlId="formBrandLogo">
-                <Form.Label>Logo URL</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter logo URL"
-                  value={editBrand?.logo || ''}
-                  onChange={(e) => setEditBrand({ ...editBrand, logo: e.target.value })}
-                />
+                {/* <FileInput
+                name='image'
+                  id="image"
+                  accept="image/*"
+                  // onChange={handleLogoChange}
+                  required
+                /> */}
+
+<Form.Label>Add Another logo</Form.Label>
+<Form.Control type="file"   name='image'
+                  
+                  accept="image/*"
+                  onChange={handleLogoChange}
+                  />
               </Form.Group>
             </Form>
           </Modal.Body>

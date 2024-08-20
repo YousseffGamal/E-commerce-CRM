@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -112,17 +113,17 @@ const Button = styled.button`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 `;
-
+import { useNavigate } from 'react-router-dom';
 const AddAdminPage = () => {
-
-
+  const navigate = useNavigate();
+  const [roles, setRoles] =useState([])
   const [Data , setData] = useState({
     name : '',
     phone : '',
     email : '',
+    password : '',
     isAdmin : 1,
     roleIds : [],
-    tempRole : ''
   })
 
 
@@ -135,60 +136,82 @@ const AddAdminPage = () => {
   }
 
   const handleAddRoles = (e) =>{
-    const { value } =e.target;
-
-    roleIds.in
-
-
-
-    setData({
-      ...Data,
-      tempRole : ''
-    })
+    const { value , checked } =e.target;
+    if(checked){
+      setData({
+        ...Data,
+        roleIds : [...Data.roleIds ,value ] 
+      })
+    } else {
+      setData({
+        ...Data,
+        roleIds : Data.roleIds.filter(id => id != value) 
+      })
+      
+    }
+    
   }
 
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [roles, setRoles] = useState({
-    admin: false,
-    editor: false,
-    viewer: false
-  });
-
-  const handleUsernameChange = (e) => setUsername(e.target.value);
-  const handleEmailChange = (e) => setEmail(e.target.value);
-  const handleRoleChange = (e) => {
-    const { name, checked } = e.target;
-    setRoles(prevRoles => ({ ...prevRoles, [name]: checked }));
-  };
+useEffect(() =>{
+  axiosInstance.get('/allRoles')
+  .then((res) =>{
+    setRoles(res.data.roles)
+  })
+  .catch((err) =>{
+  console.log(err)
+  })
+},[])
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newAdmin = {
-      username,
-      email,
-      roles
-    };
-    console.log('New Admin:', newAdmin);
-    // Add functionality to handle form submission
+    axiosInstance.post('/signup',Data)
+    .then((res) =>{
+      alert('New Admin added successfully')
+      setData({
+        name : '',
+        phone : '',
+        email : '',
+        password : '',
+        isAdmin : 1,
+        roleIds : [],
+      })
+      
+    })
+    .catch((err) =>{
+      alert(`Faild to add Admin : ${err.response.data.message}`)      
+
+    })
   };
 
   return (
     <Container>
       <Sidebar />
       <Content>
+      
         <FormContainer>
           <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Add Admin</h2>
           <Form onSubmit={handleSubmit}>
             <FormGroup>
-              <Label htmlFor="username">Name</Label>
+              <Label htmlFor="name">Name</Label>
               <Input
               name='name'
                 type="text"
-                id="username"
+                id="name"
                 value={Data.name}
                 onChange={handleChange}
-                placeholder="Enter username"
+                placeholder="Enter Name"
+                required
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="password">password</Label>
+              <Input
+              name='password'
+                type="password"
+                id="password"
+                value={Data.password}
+                onChange={handleChange}
+                placeholder="Enter password"
                 required
               />
             </FormGroup>
@@ -208,11 +231,12 @@ const AddAdminPage = () => {
               <Label htmlFor="phone">Phone</Label>
               <Input
                name='phone'
-                type="phone"
+                type="tel"
                 id="phone"
                 value={Data.phone}
                 onChange={handleChange}
-                placeholder="Enter email address"
+                placeholder="Enter phone number , only digits allowed"
+                pattern="\d*"
                 required
               />
             </FormGroup>
@@ -220,17 +244,19 @@ const AddAdminPage = () => {
 
               <Label>Roles</Label>
               <CheckboxGroup>
-                {Object.keys(roles).map(role => (
-                  <CheckboxContainer key={role}>
+                {roles?.map(role => (
+                  <CheckboxContainer key={role._id}>
                     <Checkbox
                       type="checkbox"
-                      id={role}
-                      name={role}
-                      checked={roles[role]}
-                      onChange={handleRoleChange}
+                      id={role._id}
+                      name={role.name}
+                      value={role._id}
+                      checked={Data.roleIds.includes(role._id)}
+                      onChange={handleAddRoles}
                     />
-                    <CheckboxLabel htmlFor={role}>{role.charAt(0).toUpperCase() + role.slice(1)}</CheckboxLabel>
+                    <CheckboxLabel >{role.name}</CheckboxLabel>
                   </CheckboxContainer>
+
                 ))}
               </CheckboxGroup>
 

@@ -15,7 +15,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data } = await axiosInstance.post("/signin", cred);
       console.log(data);
-      
+      console.log('from login ');
+
       // Extract permissions and other user data
       const permissions = data?.user?.roles?.flatMap((role) => role.permissions.map(permission => permission.name)) || []; 
      
@@ -43,7 +44,9 @@ export const AuthProvider = ({ children }) => {
     
   };
 
-
+  const hasPermissions = (permissionNames) =>{
+    return permissionNames.some(permission => auth.permissions.includes(permission))
+  }
 
 
   useEffect(() => {
@@ -51,6 +54,7 @@ export const AuthProvider = ({ children }) => {
       response => response,
       error => {
         if (error.response && error.response.status === 401) { // Token expired or unauthorized
+         
           logout(); // Logout the user and redirect to login page
         }
         return Promise.reject(error);
@@ -63,7 +67,7 @@ export const AuthProvider = ({ children }) => {
 
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout,hasPermissions }}>
       {children}
     </AuthContext.Provider>
   );

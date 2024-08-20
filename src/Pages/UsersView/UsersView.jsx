@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -121,42 +122,105 @@ const DeleteButton = styled.button`
 
 const UsersViewPage = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
-    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com' },
-  ]);
+  const [users, setUsers] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
+  const [roles, setRoles] =useState([])
+  const [editRoles , setEditRoles] =useState([])
 
   const handleEdit = (user) => {
+    console.log(user)
+    setEditRoles(user.roles.map(role => role._id))
     setEditUser(user);
     setShowEditModal(true);
   };
 
   const handleDelete = (id) => {
-    setUsers(users.filter(user => user.id !== id));
+   
+    if( confirm('Are you Sure you want to delete this Admin')){
+      axiosInstance.delete(`/deleteuser/${id}`)
+      .then((res) =>{
+        setUsers(users.filter(user => user._id !== id));
+      })
+      .catch((err) =>{
+      console.log(err)
+      })
+    }
+  
   };
 
   const handleCloseEditModal = () => {
+    getAllAdmins()
     setShowEditModal(false);
     setEditUser(null);
   };
 
   const handleSaveEdit = () => {
-    setUsers(users.map(user =>
-      user.id === editUser.id ? editUser : user
-    ));
-    handleCloseEditModal();
-  };
+    setEditUser({
+      ...editUser,
+      roleIds : editRoles,
+    })
 
+   axiosInstance.patch(`/updateuser/${editUser._id}`,{ userID : editUser._id,name :editUser.name , email : editUser.email, phone :editUser.phone ,roleIds :editRoles ,isAdmin: 1 } )
+   .then((res) =>{
+    console.log(res.data)
+    handleCloseEditModal();
+  })
+  .catch((err) =>{
+    alert(`Faild to add Admin : ${err.response.data.message}`)  
+  console.log(err)
+  })
+
+   
+  };
+  useEffect(() => {
+    console.log(editUser);
+  }, [editUser]);
   const handleAddUser = () => {
     navigate('/addadmin');
   };
 
+  const handleChangeForTheCheckBox =  (e) => {
+    const { value , checked} = e.target;
+    if(checked){
+      setEditRoles([...editRoles,value])
+    }else {
+      setEditRoles([...editRoles.filter(role => role != value)])
+    }
+    
+  }
+
+
+
+  const getAllRoles = () =>{
+    axiosInstance.get('/allRoles')
+    .then((res) =>{
+      setRoles(res.data.roles)
+    })
+    .catch((err) =>{
+    console.log(err)
+    })
+  }
+  const getAllAdmins = () => {
+    axiosInstance.get('/getalladmins')
+    .then((res) =>{
+      setUsers(res.data.AllAdmins)
+      console.log(res.data.AllAdmins)
+    })
+    .catch((err) =>{
+    console.log(err)
+    })
+  }
+  useEffect(() =>{
+    getAllAdmins()
+    getAllRoles()
+  },[])
+  
   return (
     <Container>
       <Sidebar />
       <Content>
+    
         <h2 style={{ marginBottom: '20px' }}>Admins</h2>
         <AddButton onClick={handleAddUser}>Add Admin</AddButton>
         <TableWrapper>
@@ -166,18 +230,22 @@ const UsersViewPage = () => {
                 <TableHeader>ID</TableHeader>
                 <TableHeader>Name</TableHeader>
                 <TableHeader>Email</TableHeader>
+                <TableHeader>phone</TableHeader>
+                <TableHeader>roles</TableHeader>
                 <TableHeader>Actions</TableHeader>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableData>{user.id}</TableData>
+              {users.map((user,index) => (
+                <TableRow key={user._id}>
+                  <TableData>{index+1}</TableData>
                   <TableData>{user.name}</TableData>
                   <TableData>{user.email}</TableData>
+                  <TableData>{user.phone}</TableData>
+                  <TableData>{user.roles.map(role => role.name).join(' / ')}</TableData>
                   <TableData>
                     <EditButton onClick={() => handleEdit(user)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(user.id)}>Delete</DeleteButton>
+                    <DeleteButton onClick={() => handleDelete(user._id)}>Delete</DeleteButton>
                   </TableData>
                 </TableRow>
               ))}
@@ -202,13 +270,36 @@ const UsersViewPage = () => {
                 />
               </Form.Group>
               <Form.Group controlId="formUserEmail">
-                <Form.Label>Email</Form.Label>
+                <Form.Label>ُُEmail</Form.Label>
                 <Form.Control
                   type="email"
-                  placeholder="Enter user email"
+                  placeholder="Enter user Email"
                   value={editUser?.email || ''}
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
                 />
+              </Form.Group>
+              <Form.Group controlId="formUserPhone">
+                <Form.Label>Phone</Form.Label>
+                <Form.Control
+                  type="phone"
+                  placeholder="Enter user phone"
+                  value={editUser?.phone || ''}
+                  onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group controlId="formUserEmail">
+                <Form.Label>Roles</Form.Label>
+                {  roles.map((role) => (
+                  <Form.Check // prettier-ignore 
+                  key={role._id}
+                  id={role.name}
+                  value={role._id}
+                  type='checkbox'
+                  checked={editRoles.includes(role._id)}
+                  label={role.name}
+                   onChange={handleChangeForTheCheckBox}
+                />
+              ))  }
               </Form.Group>
             </Form>
           </Modal.Body>

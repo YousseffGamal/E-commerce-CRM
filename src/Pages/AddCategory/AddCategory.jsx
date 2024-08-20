@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -96,9 +97,17 @@ const AddCategoryPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newCategory = { title };
-    console.log('New Category:', newCategory);
-    // Add functionality to handle form submission
+    // console.log('New Category:', newCategory);
+    axiosInstance.post('/addcategory', {title : title})
+    .then((res) =>{
+      alert('Category added successfully')
+      setTitle('')
+      console.log(res.data)
+    })
+    .catch((err) =>{
+      alert(`Faild to add category ${err.response.data.message}`)
+      console.log(err)
+    })
   };
 
   return (

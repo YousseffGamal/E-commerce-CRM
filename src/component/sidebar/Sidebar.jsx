@@ -88,11 +88,11 @@ const Button = styled.button`
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout ,hasPermissions} = useAuth();
 
   const handleclick = async () => {
-    const data = await axiosInstance.get('/getallusers');
-    console.log(data);
+  const check =  hasPermissions(['update-coupon'])
+     console.log(check)
   };
 
   const handleLogOut = () => {
@@ -103,72 +103,72 @@ const Sidebar = () => {
   return (
     <SidebarContainer>
       <SidebarHeader>CRM</SidebarHeader>
-      <MenuItem>
-        <StyledLink to="/CRM">
-          <FaHome />
-          <MenuText>Dashboard</MenuText>
-        </StyledLink>
-      </MenuItem>
-      <MenuItem>
+     <MenuItem>
+      <StyledLink to="/CRM">
+        <FaHome />
+        <MenuText>Dashboard</MenuText>
+      </StyledLink>
+    </MenuItem>
+   { hasPermissions(['read-order','update-order','create-order','delete-order']) && <MenuItem>
         <StyledLink to="/orders">
           <FaShoppingCart />
           <MenuText>Orders</MenuText>
         </StyledLink>
-      </MenuItem>
+      </MenuItem>}
       {/* <MenuItem>
         <StyledLink to="/addproduct">
           <FiPlus />
           <MenuText>Add Products</MenuText>
         </StyledLink>
       </MenuItem> */}
-      <MenuItem>
-        <StyledLink to="/products">
-          <FaEdit />
-          <MenuText>Products</MenuText>
-        </StyledLink>
-      </MenuItem>
-      <MenuItem>
+  {    hasPermissions(['read-product','update-product','create-product','delete-product']) &&    <MenuItem>
+            <StyledLink to="/products">
+              <FaEdit />
+              <MenuText>Products</MenuText>
+            </StyledLink>
+          </MenuItem>}
+      {  hasPermissions(['read-role','update-role','create-role','delete-role']) &&   <MenuItem>
         <StyledLink to="/roles">
           <FaUserPlus />
           <MenuText>Roles</MenuText>
         </StyledLink>
-      </MenuItem>
-      <MenuItem>
+      </MenuItem>}
+     {  hasPermissions(['read-brand','update-brand','create-brand','delete-brand']) && <MenuItem>
         <StyledLink to="/brand">
           <FaTag />
           <MenuText>Brand</MenuText>
         </StyledLink>
-      </MenuItem>
+      </MenuItem>}
       {/* <MenuItem>
         <StyledLink to="/addadmin">
           <FaUserPlus />
           <MenuText>Add Admin</MenuText>
         </StyledLink>
       </MenuItem> */}
-      <MenuItem>
+      { hasPermissions(['read-category','update-category','create-category','delete-category']) && <MenuItem>
         <StyledLink to="/category">
           <FaTag />
           <MenuText>Categorys</MenuText>
         </StyledLink>
-      </MenuItem>
-      <MenuItem>
+      </MenuItem>}
+     { hasPermissions(['read-subCategory','update-subCategory','create-subCategory','delete-subCategory']) && <MenuItem>
         <StyledLink to="/subcategory">
           <FaTag />
           <MenuText>Subcategory</MenuText>
         </StyledLink>
-      </MenuItem>
-      <MenuItem>
+      </MenuItem>}
+      { hasPermissions(['read-user','update-user','create-user','delete-user']) && <MenuItem>
         <StyledLink to="/usersview">
           <FaUsers />
           <MenuText>Admins</MenuText>
         </StyledLink>
-      </MenuItem>
-      <MenuItem>
+      </MenuItem>}
+      {/* <MenuItem>
         <StyledLink to="/Reports">
           <FaChartBar />
           <MenuText>Reports</MenuText>
         </StyledLink>
-      </MenuItem>
+      </MenuItem> */}
 
       <ButtonContainer>
         <Button onClick={handleLogOut}>Logout</Button>

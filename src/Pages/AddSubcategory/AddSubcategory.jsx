@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axiosInstance from '../../axios';
 
 const fadeIn = keyframes`
   from {
@@ -109,28 +110,42 @@ const AddSubcategoryPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    // Fetch categories from API or static data
-    // Example categories
-    setCategories([
-      { id: 1, name: 'Electronics' },
-      { id: 2, name: 'Books' },
-      { id: 3, name: 'Clothing' },
-    ]);
-  }, []);
+  // useEffect(() => {
+  //   // Fetch categories from API or static data
+  //   // Example categories
+  //   setCategories([
+  //     { id: 1, name: 'Electronics' },
+  //     { id: 2, name: 'Books' },
+  //     { id: 3, name: 'Clothing' },
+  //   ]);
+  // }, []);
 
   const handleTitleChange = (e) => setTitle(e.target.value);
   const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newSubcategory = {
-      title,
-      category: selectedCategory,
-    };
-    console.log('New Subcategory:', newSubcategory);
-    // Add functionality to handle form submission
+   axiosInstance.post('/addsubcategory',{title: title , category :selectedCategory })
+   .then((res) =>{
+    alert('SubCategory added successfully')
+    setTitle('')
+    setSelectedCategory('')
+  })
+  .catch((err) =>{
+   alert(`Faild to add category ${err.response.data.message}`)
+    console.log(err)
+  })
   };
+  useEffect(() =>{
+    axiosInstance.get('/getallcategories')
+    .then((res) =>{
+      setCategories(res.data.allCategories)
+    })
+    .catch((err) =>{
+      // alert(`Faild to add category ${err.response.data.message}`)
+      console.log(err)
+    })
+  },[])
 
   return (
     <Container>
@@ -159,9 +174,9 @@ const AddSubcategoryPage = () => {
                 required
               >
                 <option value="">Select a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
+                {categories?.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.title}
                   </option>
                 ))}
               </Select>

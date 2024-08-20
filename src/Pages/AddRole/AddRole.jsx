@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axiosInstance from '../../axios';
 
 const Container = styled.div`
   display: flex;
@@ -95,49 +96,81 @@ const Button = styled.button`
     background-color: #0056b3;
   }
 `;
-
+import { useNavigate } from 'react-router-dom';
 const AddRoleForm = () => {
-  const [roleName, setRoleName] = useState('');
-  const [permissions, setPermissions] = useState({
-    read: false,
-    write: false,
-    delete: false,
-  });
 
-  const handleRoleNameChange = (e) => setRoleName(e.target.value);
+
+  const navigate = useNavigate();
+  const [permissions , setPermissions] = useState([])
+  const [Data , setData] = useState({
+    roleName: '',
+    permissionsIds: [],
+  })
+
+
+  useEffect(() =>{
+    axiosInstance.get('/allPermissions')
+    .then((res) =>{
+      setPermissions(res.data)
+    })
+    .catch((err) =>{
+      console.log(err)
+    })
+  },[])
+
+  const handleChange = (e) =>{
+    const { name , value } = e.target;
+    setData({
+      ...Data,
+      [name] : value 
+    })
+  }
 
   const handlePermissionChange = (e) => {
-    const { name, checked } = e.target;
-    setPermissions((prevPermissions) => ({
-      ...prevPermissions,
-      [name]: checked,
-    }));
+    const { value, checked } = e.target;
+    if(checked){
+      setData({
+        ...Data,
+       permissionsIds : [...Data.permissionsIds,value ]
+      });
+    } else {
+      setData({
+        ...Data,
+       permissionsIds : Data.permissionsIds.filter(id => id!= value )
+      });
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newRole = {
-      roleName,
-      permissions,
-    };
-    console.log('New Role:', newRole);
-    // Add functionality to handle form submission
+    axiosInstance.post('/createRole', Data)
+    .then((res) =>{
+      navigate('/roles')
+      console.log(res.data)
+    })
+    .catch((err) =>{
+      alert('faild to add a new Role')
+      console.log(err)
+    })
   };
 
   return (
     <Container>
       <Sidebar />
+     
       <div className='rrr' style={{ display: 'flex', width: '100%', padding: '20px' }}>
         <StyledFormContainer >
           <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Add Role</h2>
           <Form onSubmit={handleSubmit}>
+          
             <FormGroup>
               <Label htmlFor="roleName">Role Name</Label>
               <Input
                 type="text"
                 id="roleName"
-                value={roleName}
-                onChange={handleRoleNameChange}
+                name='roleName'
+                value={Data.roleName}
+               onChange={handleChange}
                 placeholder="Enter role name"
                 required
               />
@@ -145,33 +178,20 @@ const AddRoleForm = () => {
             <FormGroup>
               <Label>Permissions</Label>
               <CheckboxGroup>
+               { permissions?.map((per) => 
+               (
                 <CheckboxLabel>
                   <Checkbox
                     type="checkbox"
-                    name="read"
-                    checked={permissions.read}
+                    name={per.name}
+                    value={per._id}
                     onChange={handlePermissionChange}
                   />
-                  Read
+                 {per.name}
                 </CheckboxLabel>
-                <CheckboxLabel>
-                  <Checkbox
-                    type="checkbox"
-                    name="write"
-                    checked={permissions.write}
-                    onChange={handlePermissionChange}
-                  />
-                  Write
-                </CheckboxLabel>
-                <CheckboxLabel>
-                  <Checkbox
-                    type="checkbox"
-                    name="delete"
-                    checked={permissions.delete}
-                    onChange={handlePermissionChange}
-                  />
-                  Delete
-                </CheckboxLabel>
+               )
+               ) }
+               
               </CheckboxGroup>
             </FormGroup>
             <Button type="submit">Add Role</Button>
