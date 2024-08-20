@@ -127,6 +127,7 @@ const AddProductForm = () => {
   const [brands, setBrands] = useState([]);
   const [material, setMaterial] = useState('');
   const [discountPrice, setDiscountPrice] = useState('');
+  const [discount, setDiscount] = useState(0);
   const [isFormActive, setIsFormActive] = useState(false);
 
 
@@ -187,6 +188,7 @@ useEffect(()=>{
       brand,
       material,
       discountPrice,
+      discount,
     };
 
 
@@ -209,11 +211,24 @@ useEffect(()=>{
     setBrand('');
     setMaterial('');
     setDiscountPrice('');
+    setDiscount('');
   };
 
   const handleInputChange = (e, setter) => {
     setter(e.target.value);
   };
+  useEffect(() =>{
+    
+    setDiscountPrice( price - (discount * price / 100 ) )
+
+
+  },[discount])
+  useEffect(() =>{
+
+    setDiscountPrice( price )
+
+
+  },[price])
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -338,15 +353,27 @@ useEffect(()=>{
               />
             </FormGroup>
             <FormGroup>
+              <Label htmlFor="discount">Discount </Label>
+              <Input
+                type="number"
+                id="discount"
+                value={discount}
+                onChange={(e) => handleInputChange(e, setDiscount)}
+                placeholder="Enter Discount "
+              />
+            </FormGroup>
+            <FormGroup>
               <Label htmlFor="discountPrice">Discount Price</Label>
               <Input
                 type="number"
                 id="discountPrice"
                 value={discountPrice}
-                onChange={(e) => handleInputChange(e, setDiscountPrice)}
+                // onChange={(e) => handleInputChange(e, setDiscountPrice)}
                 placeholder="Enter discount price"
+                disabled
               />
             </FormGroup>
+         
             <FormGroup>
               <Label htmlFor="image">Product Image</Label>
               <Input type="file" id="image" onChange={handleImageChange} required />
