@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Sidebar from '../../component/sidebar/Sidebar';
 import styled from 'styled-components';
@@ -20,26 +21,7 @@ const Content = styled.div`
   }
 `;
 
-const ProductTable = ({ products, onEdit, onDelete }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [editedProduct, setEditedProduct] = useState(null);
-
-  const handleEdit = (product) => {
-    setEditedProduct(product);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleSaveChanges = () => {
-    // Implement logic to save changes to the product
-    // You can update the product in the products array or make an API call to update it
-    setShowModal(false);
-    setEditedProduct(null); // Reset edited product
-  };
-
+const ProductTable = ({ products, handleEdit, handleDelete }) => {
   return (
     <>
       <div className="table-responsive">
@@ -55,91 +37,97 @@ const ProductTable = ({ products, onEdit, onDelete }) => {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
-                <tr key={product.id}>
-                  <td>{product.id}</td>
-                  <td>{product.name}</td>
-                  <td>${product.price}</td>
-                  <td>{product.description}</td>
-                  <td>
-                    <button style={{ marginRight: "10px" }} className="btn btn-warning btn-sm mr-1" onClick={() => handleEdit(product)}>
-                      <FaEdit /> Edit
-                    </button>
-                    <button className="btn btn-danger btn-sm" onClick={() => onDelete(product.id)}>
-                      <FaTrash /> Delete
-                    </button>
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <tr key={product._id}>
+                    <td></td>
+                    <td>{product.title}</td>
+                    <td>${product.price}</td>
+                    <td>{product.description}</td>
+                    <td>
+                      <button
+                        style={{ marginRight: '10px' }}
+                        className="btn btn-warning btn-sm mr-1"
+                        onClick={() => handleEdit(product)}
+                      >
+                        <FaEdit /> Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(product._id)}
+                      >
+                        <FaTrash /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    No products available
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
       </div>
-      {/* Edit Product Modal */}
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Product</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {editedProduct && (
-            <form>
-              <div className="form-group">
-                <label htmlFor="name">Name</label>
-                <input type="text" className="form-control" id="name" value={editedProduct.name} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="price">Price</label>
-                <input type="text" className="form-control" id="price" value={editedProduct.price} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea className="form-control" id="description" rows="3" value={editedProduct.description}></textarea>
-              </div>
-            </form>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleSaveChanges}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 };
 
 function ManageProducts() {
   const navigate = useNavigate();
-  const initialProducts = [
-    { id: 1, name: 'T-Shirt', price: 20, description: 'Comfortable cotton t-shirt' },
-    { id: 2, name: 'Jeans', price: 40, description: 'Stylish denim jeans' },
-    { id: 3, name: 'Hoodie', price: 35, description: 'Warm and cozy hoodie' },
-    { id: 4, name: 'Sneakers', price: 50, description: 'Trendy sneakers for everyday wear' },
-    { id: 5, name: 'Backpack', price: 25, description: 'Durable backpack for school or travel' },
-    { id: 6, name: 'Dress', price: 55, description: 'Elegant dress for special occasions' },
-    { id: 7, name: 'Sunglasses', price: 15, description: 'Stylish sunglasses for sun protection' },
-    { id: 8, name: 'Watch', price: 30, description: 'Classic wristwatch for telling time' },
-    { id: 9, name: 'Wallet', price: 20, description: 'Slim and sleek wallet for holding cards and cash' },
-    { id: 10, name: 'Jacket', price: 60, description: 'Waterproof jacket for outdoor activities' },
-    { id: 11, name: 'Skirt', price: 25, description: 'Versatile skirt for various occasions' },
-    { id: 12, name: 'Boots', price: 45, description: 'Sturdy boots for hiking or winter weather' },
-    { id: 13, name: 'Scarf', price: 10, description: 'Soft scarf for keeping warm in cold weather' },
-    { id: 14, name: 'Gloves', price: 12, description: 'Cozy gloves for protecting hands from the cold' },
-    { id: 15, name: 'Hat', price: 8, description: 'Stylish hat for adding flair to outfits' },
-    { id: 16, name: 'Socks', price: 5, description: 'Comfortable socks for everyday wear' },
-    { id: 17, name: 'Leggings', price: 18, description: 'Stretchy leggings for exercise or casual wear' },
-    { id: 18, name: 'Sweater', price: 30, description: 'Soft sweater for staying warm and stylish' },
-    { id: 19, name: 'Blouse', price: 22, description: 'Chic blouse for work or evenings out' },
-    { id: 20, name: 'Pants', price: 35, description: 'Classic pants for a polished look' },
-  ];
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
-  const [products, setProducts] = useState(initialProducts);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/getallproducts');
+        setProducts(response.data.allProducts);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
 
-  const handleDelete = (id) => {
-    setProducts(products.filter(product => product.id !== id));
+    fetchProducts();
+  }, []);
+
+  const handleDelete = async (productId) => {
+    try {
+      await axios.delete(`http://localhost:3000/deleteproduct/${productId}`);
+      setProducts(products.filter((product) => product._id !== productId));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
+
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    setShowEditModal(true);
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      await axios.patch(`http://localhost:3000/updateproduct/${selectedProduct._id}`, selectedProduct);
+      setProducts(products.map((product) =>
+        product._id === selectedProduct._id ? selectedProduct : product
+      ));
+      setShowEditModal(false);
+      setSelectedProduct(null);
+    } catch (error) {
+      console.error('Error updating product:', error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setSelectedProduct((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
   };
 
   const handleAddProduct = () => {
@@ -151,10 +139,65 @@ function ManageProducts() {
       <Sidebar />
       <Content className="container-fluid">
         <h1>Manage Products</h1>
-        <Button variant="primary" onClick={handleAddProduct} style={{ marginBottom: '20px' }}>
+        <Button
+          variant="primary"
+          onClick={handleAddProduct}
+          style={{ marginBottom: '20px' }}
+        >
           Add Product
         </Button>
-        <ProductTable products={products} onDelete={handleDelete} />
+        <ProductTable products={products} handleEdit={handleEdit} handleDelete={handleDelete} />
+        
+        {/* Edit Product Modal */}
+        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Product</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {selectedProduct && (
+              <form>
+                <div className="form-group">
+                  <label htmlFor="title">Name</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="title"
+                    value={selectedProduct.title}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="price">Price</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="price"
+                    value={selectedProduct.price}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="description">Description</label>
+                  <textarea
+                    className="form-control"
+                    id="description"
+                    rows="3"
+                    value={selectedProduct.description}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </div>
+              </form>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={handleSaveChanges}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </Content>
     </AppContainer>
   );
