@@ -227,6 +227,8 @@ const AddProductForm = () => {
     reader.readAsDataURL(file);
   };
 
+ 
+
   return (
     <Container>
       <Sidebar />
@@ -266,6 +268,22 @@ const AddProductForm = () => {
                 placeholder="Enter product price"
                 required
               />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="category">Category</Label>
+              <Select
+                id="category"
+                value={category}
+                onChange={(e) => handleInputChange(e, setCategory)}
+                required
+              >
+                <option value="default" disabled>Select category</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.title}
+                  </option>
+                ))}
+              </Select>
             </FormGroup>
             <FormGroup>
               <Label htmlFor="category">Category</Label>
