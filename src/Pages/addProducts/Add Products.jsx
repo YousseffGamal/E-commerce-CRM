@@ -126,7 +126,7 @@ const AddProductForm = () => {
   const [brand, setBrand] = useState('default');
   const [brands, setBrands] = useState([]);
   const [material, setMaterial] = useState('');
-  const [discountPrice, setDiscountPrice] = useState('');
+  const [priceAfterDiscount, setpriceAfterDiscount] = useState('');
   const [discount, setDiscount] = useState(0);
   const [isFormActive, setIsFormActive] = useState(false);
 
@@ -160,7 +160,7 @@ const AddProductForm = () => {
   }, []);
 
   useEffect(() => {
-    setDiscountPrice(price - (discount * price) / 100);
+    setpriceAfterDiscount(price - (discount * price) / 100);
   }, [discount, price]);
 
   const handleSubmit = async (e) => {
@@ -176,7 +176,7 @@ const AddProductForm = () => {
     formData.append('stockQuantity', stockQuantity);
     formData.append('brand', brand);
     formData.append('material', material);
-    formData.append('discountPrice', discountPrice);
+    formData.append('priceAfterDiscount', priceAfterDiscount);
     formData.append('discount', discount);
 
     if (images) {
@@ -209,7 +209,7 @@ const AddProductForm = () => {
     setSku('');
     setBrand('default');
     setMaterial('');
-    setDiscountPrice('');
+   setpriceAfterDiscount('');
     setDiscount(0);
   };
 
@@ -372,11 +372,11 @@ const AddProductForm = () => {
               />
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="discountPrice">Discount Price</Label>
+              <Label htmlFor="priceAfterDiscount">Discount Price</Label>
               <Input
                 type="number"
-                id="discountPrice"
-                value={discountPrice}
+                id="priceAfterDiscount"
+                value={priceAfterDiscount}
                 placeholder="Calculated discount price"
                 disabled
               />
