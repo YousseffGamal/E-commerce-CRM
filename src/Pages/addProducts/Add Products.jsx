@@ -129,6 +129,8 @@ const AddProductForm = () => {
   const [priceAfterDiscount, setpriceAfterDiscount] = useState('');
   const [discount, setDiscount] = useState(0);
   const [isFormActive, setIsFormActive] = useState(false);
+  const [subCat, setSubCat] = useState([]);
+  const [subCategory, setSubCategory] = useState('');
 
   useEffect(() => {
     const allFieldsEmpty = !title && !price && !description && !imagePreview;
@@ -162,6 +164,22 @@ const AddProductForm = () => {
   useEffect(() => {
     setpriceAfterDiscount(price - (discount * price) / 100);
   }, [discount, price]);
+
+
+  useEffect(() =>{
+
+    axiosInstance.get(`getAllSubCategoriesForAcertinCat/${category}`)
+    .then((res) =>{
+      console.log(res.data)
+      setSubCat(res.data.allSubCategories)
+    })
+    .catch((err) =>{
+      console.log(err)
+    })
+
+  },[category])
+ 
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -227,7 +245,6 @@ const AddProductForm = () => {
     reader.readAsDataURL(file);
   };
 
- 
 
   return (
     <Container>
@@ -286,15 +303,15 @@ const AddProductForm = () => {
               </Select>
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">sub Category</Label>
               <Select
-                id="category"
-                value={category}
-                onChange={(e) => handleInputChange(e, setCategory)}
+                id="subCategory"
+                value={subCategory}
+                onChange={(e) => handleInputChange(e, setSubCategory)}
                 required
               >
                 <option value="default" disabled>Select category</option>
-                {categories.map((cat) => (
+                {subCat.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.title}
                   </option>
