@@ -130,7 +130,7 @@ const AddProductForm = () => {
   const [discount, setDiscount] = useState(0);
   const [isFormActive, setIsFormActive] = useState(false);
   const [subCat, setSubCat] = useState([]);
-  const [subCategory, setSubCategory] = useState('');
+  const [subCategory, setSubCategory] = useState('default');
 
   useEffect(() => {
     const allFieldsEmpty = !title && !price && !description && !imagePreview;
@@ -167,15 +167,23 @@ const AddProductForm = () => {
 
 
   useEffect(() =>{
-
-    axiosInstance.get(`getAllSubCategoriesForAcertinCat/${category}`)
-    .then((res) =>{
-      console.log(res.data)
-      setSubCat(res.data.allSubCategories)
-    })
-    .catch((err) =>{
-      console.log(err)
-    })
+    if(category != 'default'){
+      axiosInstance.get(`getAllSubCategoriesForAcertinCat/${category}`)
+      .then((res) =>{
+        console.log(res.data)
+        if(res.data.allSubCategories == 0) {
+          setSubCategory('default')
+          setSubCat([])
+        } else {
+          setSubCat(res.data.allSubCategories)
+        }
+        
+      })
+      .catch((err) =>{
+        console.log(err)
+      })
+    }
+    
 
   },[category])
  
@@ -196,6 +204,7 @@ const AddProductForm = () => {
     formData.append('material', material);
     formData.append('priceAfterDiscount', priceAfterDiscount);
     formData.append('discount', discount);
+    formData.append('subCategory', subCategory);
 
     if (images) {
       formData.append('images', images);
@@ -359,7 +368,7 @@ const AddProductForm = () => {
                 onChange={(e) => handleInputChange(e, setBrand)}
                 required
               >
-                <option value="default" disabled>Select brand</option>
+                <option value="default" default disabled>Select brand</option>
                 {brands.map((bran) => (
                   <option key={bran._id} value={bran._id}>
                     {bran.title}
