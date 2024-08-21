@@ -236,8 +236,10 @@ const AddProductForm = () => {
     setSku('');
     setBrand('default');
     setMaterial('');
-   setpriceAfterDiscount('');
+    setpriceAfterDiscount('');
     setDiscount(0);
+    setSubCategory('default');
+    setSubCat([])
   };
 
   const handleInputChange = (e, setter) => {
