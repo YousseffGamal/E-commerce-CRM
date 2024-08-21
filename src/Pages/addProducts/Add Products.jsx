@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from 'axios';
 import axiosInstance from '../../axios';
+
 const Container = styled.div`
   display: flex;
   height: auto;
@@ -112,10 +112,10 @@ const ProductImage = styled.img`
 `;
 
 const AddProductForm = () => {
-  const [title, settitle] = useState('');
+  const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [category, setCategory] = useState('default');
   const [categories, setCategories] = useState([]);
@@ -130,109 +130,96 @@ const AddProductForm = () => {
   const [discount, setDiscount] = useState(0);
   const [isFormActive, setIsFormActive] = useState(false);
 
+  useEffect(() => {
+    const allFieldsEmpty = !title && !price && !description && !imagePreview;
+    setIsFormActive(!allFieldsEmpty);
+  }, [title, price, description, imagePreview]);
 
-  const sendProduct = async (newProduct) => {
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const response = await axiosInstance.get('/getallcategories');
+        setCategories(response.data.allCategories);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategory();
+  }, []);
+
+  useEffect(() => {
+    const fetchBrand = async () => {
+      try {
+        const response = await axiosInstance.get('/getallbrands');
+        setBrands(response.data.allBrands);
+      } catch (error) {
+        console.error('Error fetching brands:', error);
+      }
+    };
+    fetchBrand();
+  }, []);
+
+  useEffect(() => {
+    setDiscountPrice(price - (discount * price) / 100);
+  }, [discount, price]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('price', price);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('size', size);
+    formData.append('color', color);
+    formData.append('stockQuantity', stockQuantity);
+    formData.append('brand', brand);
+    formData.append('material', material);
+    formData.append('discountPrice', discountPrice);
+    formData.append('discount', discount);
+
+    if (images) {
+      formData.append('images', images);
+    }
+
     try {
-      
-      const response = await axiosInstance.post('/addproduct', newProduct );
+      const response = await axiosInstance.post('/addproduct', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       console.log('API response:', response.data);
       // Handle success if needed
     } catch (error) {
       console.error('Error submitting the product:', error);
       // Handle error if needed
     }
-  };
-
-  useEffect(() => {
-    const allFieldsEmpty = !title && !price && !description && !imagePreview;
-    setIsFormActive(!allFieldsEmpty);
-  }, [title, price, description, imagePreview]);
-
-useEffect(()=>{
-  const fetchCategory = async()=>{
-    try{
-      const response = await axiosInstance.get('/getallcategories')
-      setCategories(response.data.allCategories)
-      
-    }catch (error) {
-      console.error('Error submitting the category:', error);
-    }} 
-  fetchCategory()  
-},[])
-
-useEffect(()=>{
-  const fetchBrand = async()=>{
-    try{
-      const response = await axiosInstance.get('/getallbrands')
-      setBrands(response.data.allBrands)
-      console.log(response.data.allBrands)
-      
-    }catch (error) {
-      console.error('Error submitting the brand:', error);
-    }} 
-  fetchBrand()  
-},[])
-
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newProduct = {
-      title,
-      price,
-      description,
-      image,
-      category,
-      size,
-      color,
-      stockQuantity,
-      brand,
-      material,
-      discountPrice,
-      discount,
-    };
-
-
-     sendProduct(newProduct);
-    // Log the object to the console
-    console.log(newProduct);
-
 
     // Clear form fields
-    settitle('');
+    setTitle('');
     setPrice('');
     setDescription('');
-    setImage(null);
+    setImages(null);
     setImagePreview(null);
-    setCategory('');
+    setCategory('default');
     setSize('');
     setColor('');
     setStockQuantity('');
     setSku('');
-    setBrand('');
+    setBrand('default');
     setMaterial('');
     setDiscountPrice('');
-    setDiscount('');
+    setDiscount(0);
   };
 
   const handleInputChange = (e, setter) => {
     setter(e.target.value);
   };
-  useEffect(() =>{
-    
-    setDiscountPrice( price - (discount * price / 100 ) )
-
-
-  },[discount])
-  useEffect(() =>{
-
-    setDiscountPrice( price )
-
-
-  },[price])
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setImage(file);
+    setImages(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
@@ -243,17 +230,17 @@ useEffect(()=>{
   return (
     <Container>
       <Sidebar />
-      <div classtitle='rrr' style={{ display: 'flex', width: '100%', padding: '20px' }}>
+      <div style={{ display: 'flex', width: '100%', padding: '20px' }}>
         <StyledFormContainer isFormActive={isFormActive}>
           <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Add Product</h2>
           <Form onSubmit={handleSubmit}>
             <FormGroup>
-              <Label htmlFor="title">Product title</Label>
+              <Label htmlFor="title">Product Title</Label>
               <Input
                 type="text"
                 id="title"
                 value={title}
-                onChange={(e) => handleInputChange(e, settitle)}
+                onChange={(e) => handleInputChange(e, setTitle)}
                 placeholder="Enter product title"
                 required
               />
@@ -282,12 +269,18 @@ useEffect(()=>{
             </FormGroup>
             <FormGroup>
               <Label htmlFor="category">Category</Label>
-              
-              <Select id="category" value={category} onChange={(e) => handleInputChange(e, setCategory)} required>
-                <option value="default" disabled >Select category</option>
-                {categories.map((cat)=>(
-                <option value={cat._id}>{cat.title}</option>
-              ))}
+              <Select
+                id="category"
+                value={category}
+                onChange={(e) => handleInputChange(e, setCategory)}
+                required
+              >
+                <option value="default" disabled>Select category</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.title}
+                  </option>
+                ))}
               </Select>
             </FormGroup>
             <FormGroup>
@@ -325,21 +318,19 @@ useEffect(()=>{
             </FormGroup>
             <FormGroup>
               <Label htmlFor="brand">Brand</Label>
-
-              <Select id="brand" value={brand} onChange={(e) => handleInputChange(e, setBrand)} required>
-                <option value="default" disabled >Select brand</option>
-                {brands.map((bran)=>(
-                <option value={bran._id}>{bran.title}</option>
-              ))}
-              </Select>
-              {/* <Input
-                type="text"
+              <Select
                 id="brand"
                 value={brand}
                 onChange={(e) => handleInputChange(e, setBrand)}
-                placeholder="Enter brand title"
                 required
-              /> */}
+              >
+                <option value="default" disabled>Select brand</option>
+                {brands.map((bran) => (
+                  <option key={bran._id} value={bran._id}>
+                    {bran.title}
+                  </option>
+                ))}
+              </Select>
             </FormGroup>
             <FormGroup>
               <Label htmlFor="material">Material</Label>
@@ -353,13 +344,13 @@ useEffect(()=>{
               />
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="discount">Discount </Label>
+              <Label htmlFor="discount">Discount (%)</Label>
               <Input
                 type="number"
                 id="discount"
                 value={discount}
                 onChange={(e) => handleInputChange(e, setDiscount)}
-                placeholder="Enter Discount "
+                placeholder="Enter discount percentage"
               />
             </FormGroup>
             <FormGroup>
@@ -368,15 +359,18 @@ useEffect(()=>{
                 type="number"
                 id="discountPrice"
                 value={discountPrice}
-                // onChange={(e) => handleInputChange(e, setDiscountPrice)}
-                placeholder="Enter discount price"
+                placeholder="Calculated discount price"
                 disabled
               />
             </FormGroup>
-         
             <FormGroup>
-              <Label htmlFor="image">Product Image</Label>
-              <Input type="file" id="image" onChange={handleImageChange} required />
+              <Label htmlFor="images">Product Image</Label>
+              <Input
+                type="file"
+                id="images"
+                onChange={handleImageChange}
+                required
+              />
             </FormGroup>
             {imagePreview && <ProductImage src={imagePreview} alt="Product Preview" />}
             <Button type="submit">Add Product</Button>
