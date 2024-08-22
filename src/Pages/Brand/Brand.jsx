@@ -5,6 +5,7 @@ import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axiosInstance from '../../axios';
+import { useAuth } from '../../store/authContext';
 
 const fadeIn = keyframes`
   from {
@@ -121,6 +122,9 @@ const DeleteButton = styled.button`
 `;
 
 const BrandsPage = () => {
+
+  const {  hasPermissions } = useAuth();
+
   const navigate = useNavigate();
   const [brands, setBrands] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -204,7 +208,7 @@ const BrandsPage = () => {
    <Sidebar />
       <Content>
         <h2 style={{ marginBottom: '20px' }}>Brands</h2>
-        <AddButton onClick={handleAddBrand}>Add Brand</AddButton>
+      { hasPermissions(['create-brand']) && <AddButton onClick={handleAddBrand}>Add Brand</AddButton>}
         <TableWrapper>
           <Table>
             <thead>
@@ -225,8 +229,10 @@ const BrandsPage = () => {
                     <img src={`http://localhost:3000/uploads/${brand.image.replace('\\', '/')}`} alt={brand.title} style={{ width: '50px', height: 'auto' }} />
                   </TableData>
                   <TableData>
-                    <EditButton onClick={() => handleEdit(brand)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(brand._id)}>Delete</DeleteButton>
+
+                     {  hasPermissions(['update-brand']) && <EditButton onClick={() => handleEdit(brand)}>Edit</EditButton> }
+                   
+                   { hasPermissions(['delete-brand']) && <DeleteButton onClick={() => handleDelete(brand._id)}>Delete</DeleteButton>}
                   </TableData>
                 </TableRow>
                     
@@ -271,6 +277,7 @@ const BrandsPage = () => {
             </Form>
           </Modal.Body>
           <Modal.Footer>
+
             <Button variant="secondary" onClick={handleCloseEditModal}>
               Close
             </Button>
