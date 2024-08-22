@@ -5,7 +5,7 @@ import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axiosInstance from '../../axios';
-
+import { useAuth } from '../../store/authContext';
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -121,6 +121,7 @@ const DeleteButton = styled.button`
 `;
 
 const CategoriesPage = () => {
+  const { hasPermissions } = useAuth();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -186,7 +187,7 @@ const CategoriesPage = () => {
       <Sidebar />
       <Content>
         <h2 style={{ marginBottom: '20px' }}>Categories</h2>
-        <AddButton onClick={handleAddCategory}>Add Category</AddButton>
+        {hasPermissions(['create-category']) && <AddButton onClick={handleAddCategory}>Add Category</AddButton>}
         <TableWrapper>
           <Table>
             <thead>
@@ -202,8 +203,8 @@ const CategoriesPage = () => {
                   <TableData id={category._id}>{index+1}</TableData>
                   <TableData id={category._id}>{category.title}</TableData>
                   <TableData>
-                    <EditButton onClick={() => handleEdit(category)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(category._id)}>Delete</DeleteButton>
+                   { hasPermissions(['update-category']) && <EditButton onClick={() => handleEdit(category)}>Edit</EditButton>}
+                   {hasPermissions(['delete-category']) && <DeleteButton onClick={() => handleDelete(category._id)}>Delete</DeleteButton>}
                   </TableData>
                 </TableRow>
               ))}

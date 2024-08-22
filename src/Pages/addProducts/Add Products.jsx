@@ -130,7 +130,7 @@ const AddProductForm = () => {
   const [discount, setDiscount] = useState(0);
   const [isFormActive, setIsFormActive] = useState(false);
   const [subCat, setSubCat] = useState([]);
-  const [subCategory, setSubCategory] = useState('');
+  const [subCategory, setSubCategory] = useState('default');
 
   useEffect(() => {
     const allFieldsEmpty = !title && !price && !description && !imagePreview;
@@ -171,7 +171,7 @@ const AddProductForm = () => {
     axiosInstance.get(`getAllSubCategoriesForAcertinCat/${category}`)
     .then((res) =>{
       console.log(res.data)
-      setSubCat(res.data.allSubCategories)
+      setSubCat(response.data.allSubCategories)
     })
     .catch((err) =>{
       console.log(err)

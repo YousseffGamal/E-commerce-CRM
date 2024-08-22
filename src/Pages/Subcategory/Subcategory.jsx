@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axiosInstance from '../../axios';
-
+import { useAuth } from '../../store/authContext';
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -121,6 +121,7 @@ const DeleteButton = styled.button`
 `;
 
 const SubcategoriesPage = () => {
+  const {hasPermissions} = useAuth();
   const navigate = useNavigate();
   const [subcategories, setSubcategories] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -225,8 +226,7 @@ const SubcategoriesPage = () => {
       <Sidebar />
       <Content>
         <h2 style={{ marginBottom: '20px' }}>Subcategories</h2>
-        <AddButton onClick={() => navigate('/addsubcategory')}>Add Subcategory</AddButton>
-        <TableWrapper>
+      { hasPermissions(['create-subCategory']) && <AddButton onClick={() => navigate('/addsubcategory')}>Add Subcategory</AddButton>}        <TableWrapper>
           <Table>
             <thead>
               <tr>
@@ -243,8 +243,8 @@ const SubcategoriesPage = () => {
                   <TableData>{subcategory.title}</TableData>
                   <TableData>{subcategory.category.title}</TableData>
                   <TableData>
-                    <EditButton onClick={() => handleEdit(subcategory)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(subcategory._id)}>Delete</DeleteButton>
+                    {hasPermissions(['update-subCategory']) && <EditButton onClick={() => handleEdit(subcategory)}>Edit</EditButton>}
+                    {hasPermissions(['delete-subCategory']) && <DeleteButton onClick={() => handleDelete(subcategory._id)}>Delete</DeleteButton>}
                   </TableData>
                 </TableRow>
               ))}

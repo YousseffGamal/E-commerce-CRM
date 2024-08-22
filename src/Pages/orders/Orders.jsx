@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios, { Axios } from 'axios';
 import axiosInstance from '../../axios';
-
+// import { useAuth } from '../../store/authContext';
 const AppContainer = styled.div`
   display: flex;
 `;
@@ -57,6 +57,7 @@ const Table = styled.table`
 `;
 
 const Orders = () => {
+  // const { hasPermissions } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);

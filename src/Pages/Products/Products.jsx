@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-
+import { useAuth } from '../../store/authContext';
 const AppContainer = styled.div`
   display: flex;
 `;
@@ -77,6 +77,7 @@ const ProductTable = ({ products, handleEdit, handleDelete }) => {
 };
 
 function ManageProducts() {
+  const {hasPermissions} = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -146,7 +147,7 @@ function ManageProducts() {
         >
           Add Product
         </Button>
-        <ProductTable products={products} handleEdit={handleEdit} handleDelete={handleDelete} />
+       {hasPermissions(['create-product', 'update-product', 'delete-product'])  &&<ProductTable products={products} handleEdit={handleEdit} handleDelete={handleDelete} />}
         
         {/* Edit Product Modal */}
         <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
