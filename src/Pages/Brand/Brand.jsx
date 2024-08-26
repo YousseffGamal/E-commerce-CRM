@@ -122,7 +122,6 @@ const DeleteButton = styled.button`
 `;
 
 const BrandsPage = () => {
-  const { hasPermissions } = useAuth();
   const navigate = useNavigate();
   const [brands, setBrands] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -206,7 +205,7 @@ const BrandsPage = () => {
    <Sidebar />
       <Content>
         <h2 style={{ marginBottom: '20px' }}>Brands</h2>
-        {hasPermissions(['create-brand']) && <AddButton onClick={handleAddBrand}>Add Brand</AddButton>}
+        <AddButton onClick={handleAddBrand}>Add Brand</AddButton>
         <TableWrapper>
           <Table>
             <thead>
@@ -227,8 +226,8 @@ const BrandsPage = () => {
                     <img src={`http://localhost:3000/uploads/${brand.image.replace('\\', '/')}`} alt={brand.title} style={{ width: '50px', height: 'auto' }} />
                   </TableData>
                   <TableData>
-                    {hasPermissions(['update-brand']) && <EditButton onClick={() => handleEdit(brand)}>Edit</EditButton>}
-                    {hasPermissions(['delete-brand']) && <DeleteButton onClick={() => handleDelete(brand._id)}>Delete</DeleteButton>}
+                    <EditButton onClick={() => handleEdit(brand)}>Edit</EditButton>
+                    <DeleteButton onClick={() => handleDelete(brand._id)}>Delete</DeleteButton>
                   </TableData>
                 </TableRow>
                     
@@ -273,6 +272,7 @@ const BrandsPage = () => {
             </Form>
           </Modal.Body>
           <Modal.Footer>
+
             <Button variant="secondary" onClick={handleCloseEditModal}>
               Close
             </Button>

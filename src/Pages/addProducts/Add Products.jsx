@@ -333,9 +333,9 @@ const AddProductForm = () => {
               />
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="color">Color</Label>
+              <Label htmlFor="color">Pick a Color</Label>
               <Input
-                type="text"
+                type="color"
                 id="color"
                 value={color}
                 onChange={(e) => handleInputChange(e, setColor)}
