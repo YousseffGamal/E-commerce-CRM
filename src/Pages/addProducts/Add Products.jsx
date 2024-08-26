@@ -171,7 +171,7 @@ const AddProductForm = () => {
     axiosInstance.get(`getAllSubCategoriesForAcertinCat/${category}`)
     .then((res) =>{
       console.log(res.data)
-      setSubCat(response.data.allSubCategories)
+      setSubCat(res.data.allSubCategories)
     })
     .catch((err) =>{
       console.log(err)
@@ -196,6 +196,7 @@ const AddProductForm = () => {
     formData.append('material', material);
     formData.append('priceAfterDiscount', priceAfterDiscount);
     formData.append('discount', discount);
+    formData.append('subCategory', subCategory);
 
     if (images) {
       formData.append('images', images);
@@ -227,8 +228,10 @@ const AddProductForm = () => {
     setSku('');
     setBrand('default');
     setMaterial('');
-   setpriceAfterDiscount('');
+    setpriceAfterDiscount('');
     setDiscount(0);
+    setSubCategory('default');
+    setSubCat([])
   };
 
   const handleInputChange = (e, setter) => {
@@ -359,7 +362,7 @@ const AddProductForm = () => {
                 onChange={(e) => handleInputChange(e, setBrand)}
                 required
               >
-                <option value="default" disabled>Select brand</option>
+                <option value="default" default disabled>Select brand</option>
                 {brands.map((bran) => (
                   <option key={bran._id} value={bran._id}>
                     {bran.title}
