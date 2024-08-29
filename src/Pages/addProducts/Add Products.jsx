@@ -28,7 +28,7 @@ const StyledFormContainer = styled(FormContainerWrapper)`
   max-width: 400px;
   width: 100%;
   padding: 40px;
-  background-color: #ffffff;
+  background-colors: #ffffff;
   border-radius: 10px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
   animation: ${fadeIn} 0.5s ease;
@@ -49,7 +49,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   margin-bottom: 8px;
   font-weight: bold;
-  color: #333333;
+  colors: #333333;
 `;
 
 const Input = styled.input`
@@ -58,10 +58,10 @@ const Input = styled.input`
   border: 1px solid #cccccc;
   border-radius: 6px;
   font-size: 16px;
-  transition: border-color 0.3s ease;
+  transition: border-colors 0.3s ease;
 
   &:focus {
-    border-color: #007bff;
+    border-colors: #007bff;
     outline: none;
   }
 `;
@@ -72,32 +72,32 @@ const Select = styled.select`
   border: 1px solid #cccccc;
   border-radius: 6px;
   font-size: 16px;
-  transition: border-color 0.3s ease;
+  transition: border-colors 0.3s ease;
 
   &:focus {
-    border-color: #007bff;
+    border-colors: #007bff;
     outline: none;
   }
 `;
 
 const Button = styled.button`
   padding: 12px;
-  background-color: #007bff;
-  color: white;
+  background-colors: #007bff;
+  colors: white;
   border: none;
   border-radius: 6px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-colors 0.3s ease;
 
   &:hover {
-    background-color: #0056b3;
+    background-colors: #0056b3;
   }
 `;
 
 const PreviewContainer = styled.div`
   padding: 40px;
-  background-color: #f8f9fa;
+  background-colors: #f8f9fa;
   border-radius: 10px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
   animation: ${fadeIn} 0.5s ease;
@@ -119,18 +119,20 @@ const AddProductForm = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [category, setCategory] = useState('default');
   const [categories, setCategories] = useState([]);
-  const [size, setSize] = useState('');
-  const [color, setColor] = useState('');
-  const [stockQuantity, setStockQuantity] = useState('');
-  const [sku, setSku] = useState('');
   const [brand, setBrand] = useState('default');
   const [brands, setBrands] = useState([]);
-  const [material, setMaterial] = useState('');
-  const [priceAfterDiscount, setpriceAfterDiscount] = useState('');
+  const [priceAfterDiscount, setPriceAfterDiscount] = useState('');
   const [discount, setDiscount] = useState(0);
   const [isFormActive, setIsFormActive] = useState(false);
   const [subCat, setSubCat] = useState([]);
   const [subCategory, setSubCategory] = useState('default');
+  
+  // New state for managing size, colors, and stock quantity combinations
+  const [SizecolorsStock, setSizecolorsStock] = useState([]);
+  const [size, setSize] = useState('');
+  const [colors, setcolors] = useState('');
+  const [stock, setstock] = useState('');
+  const [material, setMaterial] = useState(''); // Added missing material state
 
   useEffect(() => {
     const allFieldsEmpty = !title && !price && !description && !imagePreview;
@@ -162,24 +164,26 @@ const AddProductForm = () => {
   }, []);
 
   useEffect(() => {
-    setpriceAfterDiscount(price - (discount * price) / 100);
+    setPriceAfterDiscount(price - (discount * price) / 100);
   }, [discount, price]);
 
-
-  useEffect(() =>{
-
-    axiosInstance.get(`getAllSubCategoriesForAcertinCat/${category}`)
-    .then((res) =>{
-      console.log(res.data)
-      setSubCat(res.data.allSubCategories)
-    })
-    .catch((err) =>{
-      console.log(err)
-    })
-
-  },[category])
- 
-
+  useEffect(() => {
+    if (category !== 'default') {
+      axiosInstance
+        .get(`getAllSubCategoriesForAcertinCat/${category}`)
+        .then((res) => {
+          console.log(res.data);
+          setSubCat(res.data.allSubCategories);
+          setSubCategory('default'); // Reset subcategory when category changes
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setSubCat([]);
+      setSubCategory('default');
+    }
+  }, [category]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -189,14 +193,20 @@ const AddProductForm = () => {
     formData.append('price', price);
     formData.append('description', description);
     formData.append('category', category);
-    formData.append('size', size);
-    formData.append('color', color);
-    formData.append('stockQuantity', stockQuantity);
     formData.append('brand', brand);
     formData.append('material', material);
     formData.append('priceAfterDiscount', priceAfterDiscount);
     formData.append('discount', discount);
     formData.append('subCategory', subCategory);
+    formData.append('SizecolorsStock', JSON.stringify(SizecolorsStock)); // Append the size-colors-quantity array
+   
+
+ // Log the FormData for debugging
+ formData.forEach((value, key) => {
+  console.log(key, value);
+  
+});
+console.log(" -->>>>" ,formData );
 
     if (images) {
       formData.append('images', images);
@@ -208,6 +218,8 @@ const AddProductForm = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+      console.log(formData);
+      
       console.log('API response:', response.data);
       // Handle success if needed
     } catch (error) {
@@ -222,16 +234,13 @@ const AddProductForm = () => {
     setImages(null);
     setImagePreview(null);
     setCategory('default');
-    setSize('');
-    setColor('');
-    setStockQuantity('');
-    setSku('');
     setBrand('default');
-    setMaterial('');
-    setpriceAfterDiscount('');
+    setMaterial(''); // Clear material field
+    setPriceAfterDiscount('');
     setDiscount(0);
     setSubCategory('default');
-    setSubCat([])
+    setSubCat([]);
+    setSizecolorsStock([]); // Clear the size-colors-quantity array
   };
 
   const handleInputChange = (e, setter) => {
@@ -248,6 +257,21 @@ const AddProductForm = () => {
     reader.readAsDataURL(file);
   };
 
+  const addSizecolorsStock = () => {
+    if (size && colors && stock) {
+      setSizecolorsStock([
+        ...SizecolorsStock,
+        { size, colors, stock },
+      ]);
+      setSize('');
+      setcolors('');
+      setstock('');
+    }
+  };
+
+  const removeSizecolorsStock = (index) => {
+    setSizecolorsStock(SizecolorsStock.filter((_, i) => i !== index));
+  };
 
   return (
     <Container>
@@ -257,47 +281,73 @@ const AddProductForm = () => {
           <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Add Product</h2>
           <Form onSubmit={handleSubmit}>
             <FormGroup>
-              <Label htmlFor="title">Product Title</Label>
+              <Label htmlFor="title">Title:</Label>
               <Input
                 type="text"
                 id="title"
                 value={title}
                 onChange={(e) => handleInputChange(e, setTitle)}
-                placeholder="Enter product title"
-                required
               />
             </FormGroup>
+
             <FormGroup>
-              <Label htmlFor="description">Description</Label>
-              <Input
-                type="text"
-                id="description"
-                value={description}
-                onChange={(e) => handleInputChange(e, setDescription)}
-                placeholder="Enter product description"
-                required
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="price">Price</Label>
+              <Label htmlFor="price">Price:</Label>
               <Input
                 type="number"
                 id="price"
                 value={price}
                 onChange={(e) => handleInputChange(e, setPrice)}
-                placeholder="Enter product price"
-                required
               />
             </FormGroup>
+
             <FormGroup>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="discount">Discount (%):</Label>
+              <Input
+                type="number"
+                id="discount"
+                value={discount}
+                onChange={(e) => handleInputChange(e, setDiscount)}
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label htmlFor="priceAfterDiscount">Price After Discount:</Label>
+              <Input
+                type="number"
+                id="priceAfterDiscount"
+                value={priceAfterDiscount}
+                disabled
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label htmlFor="description">Description:</Label>
+              <Input
+                type="text"
+                id="description"
+                value={description}
+                onChange={(e) => handleInputChange(e, setDescription)}
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label htmlFor="material">Material:</Label>
+              <Input
+                type="text"
+                id="material"
+                value={material}
+                onChange={(e) => handleInputChange(e, setMaterial)}
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label htmlFor="category">Category:</Label>
               <Select
                 id="category"
                 value={category}
                 onChange={(e) => handleInputChange(e, setCategory)}
-                required
               >
-                <option value="default" disabled>Select category</option>
+                <option value="default">Select Category</option>
                 {categories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.title}
@@ -305,116 +355,100 @@ const AddProductForm = () => {
                 ))}
               </Select>
             </FormGroup>
+
+            {subCat.length > 0 && (
+              <FormGroup>
+                <Label htmlFor="subCategory">Subcategory:</Label>
+                <Select
+                  id="subCategory"
+                  value={subCategory}
+                  onChange={(e) => handleInputChange(e, setSubCategory)}
+                >
+                  <option value="default">Select Subcategory</option>
+                  {subCat.map((sub) => (
+                    <option key={sub._id} value={sub._id}>
+                      {sub.title}
+                    </option>
+                  ))}
+                </Select>
+              </FormGroup>
+            )}
+
             <FormGroup>
-              <Label htmlFor="category">sub Category</Label>
+              <Label htmlFor="brand">Brand:</Label>
               <Select
-                id="subCategory"
-                value={subCategory}
-                onChange={(e) => handleInputChange(e, setSubCategory)}
-                required
+                id="brand"
+                value={brand}
+                onChange={(e) => handleInputChange(e, setBrand)}
               >
-                <option value="default" disabled>Select category</option>
-                {subCat.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.title}
+                <option value="default">Select Brand</option>
+                {brands.map((br) => (
+                  <option key={br._id} value={br._id}>
+                    {br.title}
                   </option>
                 ))}
               </Select>
             </FormGroup>
+
             <FormGroup>
-              <Label htmlFor="size">Size</Label>
+              <Label htmlFor="images">Image:</Label>
+              <Input type="file" id="images" onChange={handleImageChange} />
+              {imagePreview && <ProductImage src={imagePreview} alt="Preview" />}
+            </FormGroup>
+
+            <FormGroup>
+              <Label htmlFor="size">Size:</Label>
               <Input
                 type="text"
                 id="size"
                 value={size}
                 onChange={(e) => handleInputChange(e, setSize)}
-                placeholder="Enter product size"
-                required
               />
             </FormGroup>
+
             <FormGroup>
-              <Label htmlFor="color">Pick a Color</Label>
-              <Input
-                type="color"
-                id="color"
-                value={color}
-                onChange={(e) => handleInputChange(e, setColor)}
-                placeholder="Enter product color"
-                required
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="stockQuantity">Stock Quantity</Label>
-              <Input
-                type="number"
-                id="stockQuantity"
-                value={stockQuantity}
-                onChange={(e) => handleInputChange(e, setStockQuantity)}
-                placeholder="Enter stock quantity"
-                required
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="brand">Brand</Label>
-              <Select
-                id="brand"
-                value={brand}
-                onChange={(e) => handleInputChange(e, setBrand)}
-                required
-              >
-                <option value="default" default disabled>Select brand</option>
-                {brands.map((bran) => (
-                  <option key={bran._id} value={bran._id}>
-                    {bran.title}
-                  </option>
-                ))}
-              </Select>
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="material">Material</Label>
+              <Label htmlFor="colors">colors:</Label>
               <Input
                 type="text"
-                id="material"
-                value={material}
-                onChange={(e) => handleInputChange(e, setMaterial)}
-                placeholder="Enter material"
-                required
+                id="colors"
+                value={colors}
+                onChange={(e) => handleInputChange(e, setcolors)}
               />
             </FormGroup>
+
             <FormGroup>
-              <Label htmlFor="discount">Discount (%)</Label>
+              <Label htmlFor="stock">Stock Quantity:</Label>
               <Input
                 type="number"
-                id="discount"
-                value={discount}
-                onChange={(e) => handleInputChange(e, setDiscount)}
-                placeholder="Enter discount percentage"
+                id="stock"
+                value={stock}
+                onChange={(e) => handleInputChange(e, setstock)}
               />
             </FormGroup>
-            <FormGroup>
-              <Label htmlFor="priceAfterDiscount">Discount Price</Label>
-              <Input
-                type="number"
-                id="priceAfterDiscount"
-                value={priceAfterDiscount}
-                placeholder="Calculated discount price"
-                disabled
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="images">Product Image</Label>
-              <Input
-                type="file"
-                id="images"
-                onChange={handleImageChange}
-                required
-              />
-            </FormGroup>
-            {imagePreview && <ProductImage src={imagePreview} alt="Product Preview" />}
-            <Button type="submit">Add Product</Button>
+
+            <Button type="button" onClick={addSizecolorsStock}>
+              Add Size/colors/Stock
+            </Button>
+
+            <div>
+              {SizecolorsStock.map((scs, index) => (
+                <div key={index}>
+                  <p>
+                    Size: {scs.size}, colors: {scs.colors}, Stock: {scs.stock}
+                    <Button
+                      type="button"
+                      onClick={() => removeSizecolorsStock(index)}
+                    >
+                      Remove
+                    </Button>
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <Button type="submit">Submit</Button>
           </Form>
         </StyledFormContainer>
-        <PreviewContainer></PreviewContainer>
       </div>
     </Container>
   );
