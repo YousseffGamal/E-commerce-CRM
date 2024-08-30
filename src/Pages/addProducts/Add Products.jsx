@@ -100,6 +100,19 @@ const ImagesContainer = styled.div`
   grid-template-columns: repeat(3, 1fr);  /* Three images per row */
   gap: 10px;  /* Space between images */
 `;
+
+const ImagePreviewContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); // Three images per row
+  gap: 10px; // Space between images
+  margin-top: 10px; // Space above the grid
+`;
+
+const ProductImage = styled.img`
+  width: 100%; // Make images fill their cell
+  height: auto; // Maintain aspect ratio
+  border-radius: 4px; // Optional: rounded corners
+`;
 const PreviewContainer = styled.div`
   padding: 40px;
   background-colors: #f8f9fa;
@@ -109,12 +122,12 @@ const PreviewContainer = styled.div`
   width: 100%;
 `;
 
-const ProductImage = styled.img`
-  max-width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: 10px;
-`;
+// const ProductImage = styled.img`
+//   max-width: 100%;
+//   max-height: 200px;
+//   object-fit: cover;
+//   border-radius: 10px;
+// `;
 
 const AddProductForm = () => {
   const [title, setTitle] = useState('');
@@ -212,28 +225,43 @@ const AddProductForm = () => {
     console.log('Total Files:', allFiles.length); // Directly log the combined file count
 
     setImages(allFiles);
-  
-    const filePreviews = allFiles.map(file => {
-      // const reader = new FileReader();
-    //   reader.onloadend = () => {
-    //     setImagePreview(prev => {
-    //       const newPreviews = [...prev, reader.result];
-    //       console.log('New previews array:', newPreviews); // This should show a growing array with each file loaded
-    //       return newPreviews;
-    //   });
-    //   };
-    //   reader.readAsDataURL(file);
-    // });
-    const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-            setImagePreview(prev => {
-                    const newPreviews = [...prev, reader.result];
-                    console.log('New previews array:', newPreviews); // This should show a growing array with each file loaded
-                    return newPreviews;
-                }); // Append new previews
-        };
+
+    newFilesArray.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(prev => [...prev, reader.result]);  // Append only new previews
+      };
+      reader.readAsDataURL(file);
     });
+  
+    // const filePreviews = allFiles.map(file => {
+    //   // const reader = new FileReader();
+    // //   reader.onloadend = () => {
+    // //     setImagePreview(prev => {
+    // //       const newPreviews = [...prev, reader.result];
+    // //       console.log('New previews array:', newPreviews); // This should show a growing array with each file loaded
+    // //       return newPreviews;
+    // //   });
+    // //   };
+    // //   reader.readAsDataURL(file);
+    // // });
+    // const reader = new FileReader();
+    //     reader.readAsDataURL(file);
+    //     reader.onloadend = () => {
+    //       setImagePreview(prev => [...prev, reader.result]);
+    //         // setImagePreview(prev => {
+    //         //   console.log('imagePreview.length1:', imagePreview.length); // This should show a growing array with each file loaded
+
+    //         //         const newPreviews = [...prev, reader.result];
+    //         //         console.log('New previews array:', newPreviews); // This should show a growing array with each file loaded
+    //         //         console.log('imagePreview.length2:', imagePreview.length); // This should show a growing array with each file loaded
+
+    //         //         return newPreviews;
+                    
+    //         //     }); // Append new previews
+                
+    //     };
+    // });
   };
 
   
@@ -472,19 +500,23 @@ console.log(" -->>>>" ,formData );
               </Select>
             </FormGroup>
 
-            {/* <FormGroup>
-              <Label htmlFor="images">Image:</Label>
-              <Input type="file" id="images" onChange={handleImageChange} />
-              {imagePreview && <ProductImage src={imagePreview} alt="Preview" />}
-            </FormGroup> */}
-            {/* <h1>///{images.length}///{imagePreview.length}</h1> */}
+            
             <FormGroup>
+  <Label htmlFor="images">Images:</Label>
+  <Input type="file" id="images" onChange={handleImageChange} multiple />
+  <ImagePreviewContainer>
+    {imagePreview.map((src, index) => (
+      <ProductImage key={index} src={src} alt={`Preview ${index + 1}`} />
+    ))}
+  </ImagePreviewContainer>
+</FormGroup>
+            {/* <FormGroup>
     <Label htmlFor="images">Images:</Label>
     <Input type="file" id="images" onChange={handleImageChange} multiple />
-    {imagePreview.map((src, index) => (
-        <ProductImage key={index} src={src} alt={`Preview ${index + 1}`} />
-    ))}
-</FormGroup>
+      {imagePreview.map((src, index) => (
+          <ProductImage key={index} src={src} alt={`Preview ${index + 1}`} />
+      ))}
+</FormGroup> */}
             {/* <FormGroup>
               <Label htmlFor="size">Size:</Label>
               <Input
