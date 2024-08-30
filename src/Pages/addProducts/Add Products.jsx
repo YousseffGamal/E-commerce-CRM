@@ -95,6 +95,11 @@ const Button = styled.button`
   }
 `;
 
+const ImagesContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  /* Three images per row */
+  gap: 10px;  /* Space between images */
+`;
 const PreviewContainer = styled.div`
   padding: 40px;
   background-colors: #f8f9fa;
@@ -115,8 +120,12 @@ const AddProductForm = () => {
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const [images, setImages] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [images, setImages] = useState([]); // Changed to an array
+  const [imagePreview, setImagePreview] = useState([]);
+  // const [images, setImages] = useState(null);
+  // const [imagePreview, setImagePreview] = useState(null);
+
+  // const [imagePreview, setImagePreview] = useState(null);
   const [category, setCategory] = useState('default');
   const [categories, setCategories] = useState([]);
   const [brand, setBrand] = useState('default');
@@ -135,15 +144,23 @@ const AddProductForm = () => {
   const [material, setMaterial] = useState(''); // Added missing material state
 
   useEffect(() => {
-    const allFieldsEmpty = !title && !price && !description && !imagePreview;
+    const allFieldsEmpty = !title && !price && !description && imagePreview.length === 0;
     setIsFormActive(!allFieldsEmpty);
   }, [title, price, description, imagePreview]);
+
+
+
+  // useEffect(() => {
+  //   const allFieldsEmpty = !title && !price && !description && !imagePreview;
+  //   setIsFormActive(!allFieldsEmpty);
+  // }, [title, price, description, imagePreview]);
 
   useEffect(() => {
     const fetchCategory = async () => {
       try {
         const response = await axiosInstance.get('/getallcategories');
         setCategories(response.data.allCategories);
+        // console.log("response", response);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -185,6 +202,41 @@ const AddProductForm = () => {
     }
   }, [category]);
 
+  const handleImageChange = (e) => {
+    // const filesArray = Array.from(e.target.files); // Convert FileList to array
+    // console.log('filesArray:', filesArray);  // Log the length of files array
+    // console.log('Total Files:', filesArray.length);  // Log the length of files array
+    // setImages(filesArray);
+    const newFilesArray = Array.from(e.target.files);
+    const allFiles = [...images, ...newFilesArray];  // Combine old and new files
+    console.log('Total Files:', allFiles.length); // Directly log the combined file count
+
+    setImages(allFiles);
+  
+    const filePreviews = allFiles.map(file => {
+      // const reader = new FileReader();
+    //   reader.onloadend = () => {
+    //     setImagePreview(prev => {
+    //       const newPreviews = [...prev, reader.result];
+    //       console.log('New previews array:', newPreviews); // This should show a growing array with each file loaded
+    //       return newPreviews;
+    //   });
+    //   };
+    //   reader.readAsDataURL(file);
+    // });
+    const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+            setImagePreview(prev => {
+                    const newPreviews = [...prev, reader.result];
+                    console.log('New previews array:', newPreviews); // This should show a growing array with each file loaded
+                    return newPreviews;
+                }); // Append new previews
+        };
+    });
+  };
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -198,8 +250,11 @@ const AddProductForm = () => {
     formData.append('priceAfterDiscount', priceAfterDiscount);
     formData.append('discount', discount);
     formData.append('subCategory', subCategory);
+    console.log('without:', (SizecolorsStock));
     formData.append('SizecolorsStock', JSON.stringify(SizecolorsStock)); // Append the size-colors-quantity array
+    // console.log('title //',title)
    
+    
 
  // Log the FormData for debugging
  formData.forEach((value, key) => {
@@ -208,16 +263,36 @@ const AddProductForm = () => {
 });
 console.log(" -->>>>" ,formData );
 
-    if (images) {
-      formData.append('images', images);
-    }
+    
+    // if (images) {
+    //   formData.append('images', images);
+    // }
+  //   if (images.length) {
+  //     images.forEach((file, index) => {
+  //         formData.append(`images[${index}]`, file);
+  //     });
+  // }
+  if (images.length) {
+    images.forEach(file => {
+        formData.append('images', file); // Ensure backend accepts 'images' as an array
+    });
+}
+  
 
     try {
       const response = await axiosInstance.post('/addproduct', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          // 'Content-Type': 'multipart/form-data',
         },
       });
+
+    // try {
+    //   const response = await axiosInstance.post('/addproduct', formData, {
+    //       // headers: {
+    //       //   'Content-Type': 'multipart/form-data',
+    //       // },
+    //     });
+      
       console.log(formData);
       
       console.log('API response:', response.data);
@@ -231,8 +306,10 @@ console.log(" -->>>>" ,formData );
     setTitle('');
     setPrice('');
     setDescription('');
-    setImages(null);
-    setImagePreview(null);
+    setImages([]);
+    setImagePreview([]);
+    // setImages(null);
+    // setImagePreview(null);
     setCategory('default');
     setBrand('default');
     setMaterial(''); // Clear material field
@@ -247,15 +324,19 @@ console.log(" -->>>>" ,formData );
     setter(e.target.value);
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImages(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   setImages(file);
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     setImagePreview(reader.result);
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
+
+  
+ 
+  
 
   const addSizecolorsStock = () => {
     if (size && colors && stock) {
@@ -275,6 +356,7 @@ console.log(" -->>>>" ,formData );
 
   return (
     <Container>
+      
       <Sidebar />
       <div style={{ display: 'flex', width: '100%', padding: '20px' }}>
         <StyledFormContainer isFormActive={isFormActive}>
@@ -390,21 +472,42 @@ console.log(" -->>>>" ,formData );
               </Select>
             </FormGroup>
 
-            <FormGroup>
+            {/* <FormGroup>
               <Label htmlFor="images">Image:</Label>
               <Input type="file" id="images" onChange={handleImageChange} />
               {imagePreview && <ProductImage src={imagePreview} alt="Preview" />}
-            </FormGroup>
-
+            </FormGroup> */}
+            {/* <h1>///{images.length}///{imagePreview.length}</h1> */}
             <FormGroup>
+    <Label htmlFor="images">Images:</Label>
+    <Input type="file" id="images" onChange={handleImageChange} multiple />
+    {imagePreview.map((src, index) => (
+        <ProductImage key={index} src={src} alt={`Preview ${index + 1}`} />
+    ))}
+</FormGroup>
+            {/* <FormGroup>
               <Label htmlFor="size">Size:</Label>
               <Input
                 type="text"
                 id="size"
                 value={size}
                 onChange={(e) => handleInputChange(e, setSize)}
+                
               />
-            </FormGroup>
+            </FormGroup> */}
+            <FormGroup>
+            <Label htmlFor="size">Choose a size:</Label>
+            <Select id="size" value={size} onChange={(e) => setSize(e.target.value)}>
+              <option value="">Select a size</option>
+              <option value="XXS">XXSMALL</option>
+              <option value="XS">XSMALL</option>
+              <option value="S">SMALL</option>
+              <option value="M">MEDIUM</option>
+              <option value="L">LARGE</option>
+              <option value="XL">XLARGE</option>
+              <option value="XXL">XXLARGE</option>
+            </Select>
+          </FormGroup>
 
             <FormGroup>
               <Label htmlFor="colors">colors:</Label>
@@ -413,7 +516,9 @@ console.log(" -->>>>" ,formData );
                 id="colors"
                 value={colors}
                 onChange={(e) => handleInputChange(e, setcolors)}
+                
               />
+              <h2>{colors}</h2>
             </FormGroup>
 
             <FormGroup>
@@ -423,6 +528,7 @@ console.log(" -->>>>" ,formData );
                 id="stock"
                 value={stock}
                 onChange={(e) => handleInputChange(e, setstock)}
+                
               />
             </FormGroup>
 
