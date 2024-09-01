@@ -28,7 +28,7 @@ const StyledFormContainer = styled(FormContainerWrapper)`
   max-width: 400px;
   width: 100%;
   padding: 40px;
-  background-colors: #ffffff;
+  background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
   animation: ${fadeIn} 0.5s ease;
@@ -49,7 +49,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   margin-bottom: 8px;
   font-weight: bold;
-  colors: #333333;
+  color: #333333;
 `;
 
 const Input = styled.input`
@@ -58,10 +58,10 @@ const Input = styled.input`
   border: 1px solid #cccccc;
   border-radius: 6px;
   font-size: 16px;
-  transition: border-colors 0.3s ease;
+  transition: border-color 0.3s ease;
 
   &:focus {
-    border-colors: #007bff;
+    border-color: #007bff;
     outline: none;
   }
 `;
@@ -72,26 +72,26 @@ const Select = styled.select`
   border: 1px solid #cccccc;
   border-radius: 6px;
   font-size: 16px;
-  transition: border-colors 0.3s ease;
+  transition: border-color 0.3s ease;
 
   &:focus {
-    border-colors: #007bff;
+    border-color: #007bff;
     outline: none;
   }
 `;
 
 const Button = styled.button`
   padding: 12px;
-  background-colors: #007bff;
-  colors: white;
+  background-color: #007bff;
+  color: white;
   border: none;
   border-radius: 6px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-colors 0.3s ease;
+  transition: background-color 0.3s ease;
 
   &:hover {
-    background-colors: #0056b3;
+    background-color: #0056b3;
   }
 `;
 
@@ -115,7 +115,7 @@ const ProductImage = styled.img`
 `;
 const PreviewContainer = styled.div`
   padding: 40px;
-  background-colors: #f8f9fa;
+  background-color: #f8f9fa;
   border-radius: 10px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
   animation: ${fadeIn} 0.5s ease;
@@ -149,11 +149,11 @@ const AddProductForm = () => {
   const [subCat, setSubCat] = useState([]);
   const [subCategory, setSubCategory] = useState('default');
   
-  // New state for managing size, colors, and stock quantity combinations
+  // New state for managing size, color, and stock quantity combinations
   const [SizecolorsStock, setSizecolorsStock] = useState([]);
   const [size, setSize] = useState('');
-  const [colors, setcolors] = useState('');
-  const [stock, setstock] = useState('');
+  const [color, setColor] = useState('');
+  const [stock, setStock] = useState('');
   const [material, setMaterial] = useState(''); // Added missing material state
 
   useEffect(() => {
@@ -279,7 +279,20 @@ const AddProductForm = () => {
     formData.append('discount', discount);
     formData.append('subCategory', subCategory);
     console.log('without:', (SizecolorsStock));
-    formData.append('SizecolorsStock', JSON.stringify(SizecolorsStock)); // Append the size-colors-quantity array
+    // formData.append('SizecolorsStock', JSON.stringify(SizecolorsStock)); // Append the size-color-quantity array
+    SizecolorsStock.forEach((scs, index) => {
+      formData.append(`SizecolorsStock[${index}][size]`, scs.size);
+      scs.variants.forEach((variant, variantIndex) => {
+        formData.append(
+          `SizecolorsStock[${index}][variants][${variantIndex}][color]`,
+          variant.color
+        );
+        formData.append(
+          `SizecolorsStock[${index}][variants][${variantIndex}][stock]`,
+          variant.stock
+        );
+      });
+    });
     // console.log('title //',title)
    
     
@@ -345,7 +358,7 @@ console.log(" -->>>>" ,formData );
     setDiscount(0);
     setSubCategory('default');
     setSubCat([]);
-    setSizecolorsStock([]); // Clear the size-colors-quantity array
+    setSizecolorsStock([]); // Clear the size-color-quantity array
   };
 
   const handleInputChange = (e, setter) => {
@@ -366,15 +379,37 @@ console.log(" -->>>>" ,formData );
  
   
 
+  // const addSizecolorsStock = () => {
+  //   if (size && color && stock) {
+  //     setSizecolorsStock([
+  //       ...SizecolorsStock,
+  //       { size, color, stock },
+  //     ]);
+  //     setSize('');
+  //     setColor('');
+  //     setStock('');
+  //   }
+  // };
+
   const addSizecolorsStock = () => {
-    if (size && colors && stock) {
+    if (size && color && stock) {
+      // Update SizecolorsStock with new size and variant (color and stock)
       setSizecolorsStock([
         ...SizecolorsStock,
-        { size, colors, stock },
+        {
+          size,  // Add size
+          variants: [
+            {
+              color,  // Add color
+              stock,  // Add stock for this color
+            }
+          ]
+        }
       ]);
+      // Clear the inputs after adding
       setSize('');
-      setcolors('');
-      setstock('');
+      setColor('');
+      setStock('');
     }
   };
 
@@ -542,15 +577,15 @@ console.log(" -->>>>" ,formData );
           </FormGroup>
 
             <FormGroup>
-              <Label htmlFor="colors">colors:</Label>
+              <Label htmlFor="color">color:</Label>
               <Input
                 type="text"
-                id="colors"
-                value={colors}
-                onChange={(e) => handleInputChange(e, setcolors)}
+                id="color"
+                value={color}
+                onChange={(e) => handleInputChange(e, setColor)}
                 
               />
-              <h2>{colors}</h2>
+              <h2>{color}</h2>
             </FormGroup>
 
             <FormGroup>
@@ -559,30 +594,36 @@ console.log(" -->>>>" ,formData );
                 type="number"
                 id="stock"
                 value={stock}
-                onChange={(e) => handleInputChange(e, setstock)}
+                onChange={(e) => handleInputChange(e, setStock)}
                 
               />
             </FormGroup>
 
             <Button type="button" onClick={addSizecolorsStock}>
-              Add Size/colors/Stock
+              Add Size/color/Stock
             </Button>
 
-            <div>
-              {SizecolorsStock.map((scs, index) => (
-                <div key={index}>
-                  <p>
-                    Size: {scs.size}, colors: {scs.colors}, Stock: {scs.stock}
-                    <Button
-                      type="button"
-                      onClick={() => removeSizecolorsStock(index)}
-                    >
-                      Remove
-                    </Button>
-                  </p>
-                </div>
-              ))}
-            </div>
+          <div>
+  {SizecolorsStock.map((scs, index) => (
+    <div key={index}>
+      <p>Size: {scs.size}</p>
+      {scs.variants.map((variant, variantIndex) => (
+        <div key={variantIndex}>
+          <p>
+            Color: {variant.color}, Stock: {variant.stock}
+            <Button
+              type="button"
+              onClick={() => removeSizecolorsStock(index, variantIndex)}
+            >
+              Remove
+            </Button>
+          </p>
+        </div>
+      ))}
+    </div>
+  ))}
+</div>
+
 
             <Button type="submit">Submit</Button>
           </Form>
