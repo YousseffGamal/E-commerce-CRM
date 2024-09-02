@@ -3,9 +3,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Sidebar from '../../component/sidebar/Sidebar';
 import styled from 'styled-components';
 import { Modal, Button, Form } from 'react-bootstrap';
-import axios, { Axios } from 'axios';
 import axiosInstance from '../../axios';
-// import { useAuth } from '../../store/authContext';
+import Select from 'react-select';
+import { FaEdit } from 'react-icons/fa';  // Importing the edit icon
+
 const AppContainer = styled.div`
   display: flex;
 `;
@@ -14,50 +15,93 @@ const Content = styled.div`
   flex: 1;
   margin-left: 250px;
   padding: 20px;
-  background-color: #f4f6f9;
+  background-color: transparent;
   @media (max-width: 768px) {
     margin-left: 60px;
   }
 `;
 
+const TableContainer = styled.div`
+  overflow-x: auto;
+  margin-top: 30px;  // Reduced margin
+  border-radius: 15px;  // Reduced border-radius
+  background-color: transparent;
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.03);  // Reduced shadow
+`;
+
 const Table = styled.table`
   width: 100%;
-  border-collapse: collapse;
-  thead {
-    background-color: #007bff;
-    color: white;
-    th {
-      padding: 12px;
-      text-align: left;
-    }
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 15px;  // Reduced border-radius
+  overflow: hidden;
+  background-color: transparent;
+`;
+
+const Th = styled.th`
+  padding: 12px 20px;  // Reduced padding
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  background-color: #FFFFFF;
+  color: #99A1B7;
+  font-family: "LufgaRegular";
+  font-size: 14px;  // Reduced font-size
+  font-weight: bold;
+`;
+
+const Td = styled.td`
+  padding: 15px 20px;  // Reduced padding
+  border-bottom: 1px solid #FFFFFF;
+  color: #78829D;
+  font-size: 14px;  // Reduced font-size
+  font-family: "LufgaRegular";
+  font-weight: 600;
+  text-align: left;
+  background-color: transparent;
+
+  &:first-child {
+    border-left: 2px solid #FFFFFF;
+    padding-left: 10px;  // Reduced padding
   }
-  tbody {
-    tr {
-      &:nth-child(odd) {
-        background-color: #f9f9f9;
-      }
-      td {
-        padding: 12px;
-      }
-    }
+
+  &:last-child {
+    text-align: center;
+    padding-right: 5px;  // Reduced padding
+    color: black;
   }
-  .btn-danger {
-    transition: background-color 0.3s ease;
-    &:hover {
-      background-color: #c82333;
-    }
-  }
-  .btn-primary {
-    margin-left: 10px;
-    transition: background-color 0.3s ease;
-    &:hover {
-      background-color: #0056b3;
-    }
+`;
+
+const statusColors = {
+  'Pending': '#F6C90E',  // Example color for Pending
+  'Accepted': '#299C61',  // Example color for Accepted
+  'Rejected': '#9C292B',  // Example color for Rejected
+  'Canceled': '#E74C3C',  // Example color for Canceled
+  'Out of Stock': '#9C292B',  // Example color for Out of Stock
+  'Default': '#BDC3C7'  // Default color for undefined statuses
+};
+
+const StatusTd = styled(Td)`
+  color: ${({ $status }) => ($status === 'Out of Stock' ? '#FFFFFF' : '#FFFFFF')};
+  background-color: ${({ $status }) => statusColors[$status] || statusColors['Default']};
+  border-radius: 8px;  // Reduced border-radius
+  padding: 6px 20px;  // Reduced padding
+  display: inline-block;
+  margin-top: 10%;  // Reduced margin
+`;
+
+const EditIcon = styled(FaEdit)`
+  font-size: 1.25rem;
+  color: #299C61;
+  cursor: pointer;
+  margin: 25px 0;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #1D7A50;
   }
 `;
 
 const Orders = () => {
-  // const { hasPermissions } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -68,7 +112,6 @@ const Orders = () => {
   const getOrderStatus = () => {
     axiosInstance.get('orderStatus')
       .then((res) => {
-        console.log(res.data);
         setStatus(res.data);
       })
       .catch((err) => {
@@ -80,7 +123,6 @@ const Orders = () => {
     const query = statusIDs.length ? `/orders?statusIDs=${statusIDs.join(',')}` : '/orders';
     axiosInstance.get(query)
       .then((res) => {
-        console.log(res.data);
         setOrders(res.data);
       })
       .catch((err) => {
@@ -95,7 +137,7 @@ const Orders = () => {
 
   useEffect(() => {
     getAllOrders();
-  }, [statusIDs]); // Trigger fetching orders when statusIDs changes
+  }, [statusIDs]);
 
   const handleUpdateOrder = (order) => {
     getOrderStatus();
@@ -107,13 +149,12 @@ const Orders = () => {
   const handleModalClose = () => {
     setShowModal(false);
     setSelectedOrder(null);
-    getAllOrders(); // Refresh orders after closing modal
+    getAllOrders();
   };
 
   const handleModalSave = async () => {
     axiosInstance.patch(`orders/${selectedOrder._id}`, { status: selectedStatus })
       .then((res) => {
-        console.log(res.data);
         handleModalClose();
       })
       .catch((err) => {
@@ -121,11 +162,8 @@ const Orders = () => {
       });
   };
 
-  const handleAddFilters = (e) => {
-    const { value, checked } = e.target;
-    setStatusIDs(prevIDs =>
-      checked ? [...prevIDs, value] : prevIDs.filter(id => id !== value)
-    );
+  const handleAddFilters = (selectedOptions) => {
+    setStatusIDs(selectedOptions.map(option => option.value));
   };
 
   return (
@@ -133,72 +171,57 @@ const Orders = () => {
       <Sidebar />
       <Content>
         <h1>Orders</h1>
-        <h5>Filers</h5>
-       
-         <div className="boxCheckBox">
-
-        {
-          
-          status.map((stat,index) => (
-          <div>
-                <input type="checkbox" id={stat._id}  key={stat._id} name={stat.name}
-                        value={stat._id} 
-            // checked={Data.roleIds.includes(role._id)}
+        <h5>Filters</h5>
+        <div className="boxCheckBox">
+          <Select
+            isMulti
+            options={status.map(stat => ({ value: stat._id, label: stat.name }))}
             onChange={handleAddFilters}
-            />
-             <span  key={index}>  {stat.name}</span>
-            </div>
-            
-          ))
-        } 
-        
-     
+            placeholder="Select Order Status"
+          />
         </div>
-       
-        <div className="table-responsive">
-          <Table className="table table-striped">
+        <TableContainer>
+          <Table>
             <thead>
               <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th>Discount</th>
-                <th>Total Price After Discount</th>
-                <th>Payment Method</th>
-                <th>Shipping address</th>
-                <th>ٍStatus</th>
-                <th>Action</th>
+                <Th>Order ID</Th>
+                <Th>Customer</Th>
+                <Th>Product</Th>
+                <Th>Quantity</Th>
+                <Th>Total</Th>
+                <Th>Discount</Th>
+                <Th>Total Price After Discount</Th>
+                <Th>Payment Method</Th>
+                <Th>Shipping Address</Th>
+                <Th>Status</Th>
+                <Th>Action</Th>
               </tr>
             </thead>
             <tbody>
-              {orders?.map((order,index) => (
+              {orders.map((order, index) => (
                 <tr key={order._id}>
-                  <td>{index +1}</td>
-                  <td>{order.user.name}</td>
-                  <td>
-                    {order?.cartItems?.map(item => (
+                  <Td style={{ color: '#071437' }}>{index + 1}</Td>
+                  <Td>{order.user.name}</Td>
+                  <Td>
+                    {order.cartItems.map(item => (
                       <div key={item.product._id}>{item.product.title}</div>
                     ))}
-                  </td>
-                  <td>{order.cartItems.reduce((total, item) => total + item.quantity, 0)}</td>
-                  <td>${order.totalOrderPrice}</td>
-                  <td>{order.discount}%</td>
-                  <td>${order.totalOrderPriceAfterDiscount}</td>
-                  <td>{order.paymentMethod}</td>
-                  <td>{order.shippingAddress}</td>
-                  <td>{order.status.name}</td>
-                  <td>
-                    <button className="btn btn-primary btn-sm" onClick={() => handleUpdateOrder(order)}>
-                      Update Status
-                    </button>
-                  </td>
+                  </Td>
+                  <Td>{order.cartItems.reduce((total, item) => total + item.quantity, 0)}</Td>
+                  <Td>${order.totalOrderPrice}</Td>
+                  <Td>{order.discount}%</Td>
+                  <Td>${order.totalOrderPriceAfterDiscount}</Td>
+                  <Td>{order.paymentMethod}</Td>
+                  <Td>{order.shippingAddress}</Td>
+                  <StatusTd $status={order.status.name}>{order.status.name}</StatusTd>
+                  <Td>
+                    <EditIcon onClick={() => handleUpdateOrder(order)} />
+                  </Td>
                 </tr>
               ))}
             </tbody>
           </Table>
-        </div>
+        </TableContainer>
       </Content>
 
       {/* Update Modal */}
@@ -207,114 +230,21 @@ const Orders = () => {
           <Modal.Title>Update Order</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        <Form.Group controlId="formSubcategoryCategory">
-                <Form.Label>Category</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                >
-                  <option value="">Select a category</option>
-                  {status?.map((stat) => (
-                    <option key={stat._id} value={stat._id}>
-                      {stat.name}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-
-
-
-
-          {/* {selectedOrder && (
-            <Form>
-              <Form.Group controlId="formOrderId">
-                <Form.Label>Order ID</Form.Label>
-                <Form.Control type="text" readOnly value={selectedOrder._id} />
-              </Form.Group>
-              <Form.Group controlId="formCustomerName">
-                <Form.Label>Customer</Form.Label>
-                <Form.Control type="text" value={selectedOrder.user.name} onChange={(e) => setSelectedOrder({ ...selectedOrder, user: { ...selectedOrder.user, name: e.target.value } })} />
-              </Form.Group>
-              <Form.Group controlId="formProducts">
-                <Form.Label>Products</Form.Label>
-                {selectedOrder?.cartItems.map((item, index) => (
-                  <div key={index} className="mb-3">
-                    <Form.Control
-                      type="text"
-                      value={item.productId.title}
-                      readOnly
-                    />
-                     <Form.Control
-                      type="number"
-                      value={item.quantity}
-                      onChange={(e) => {
-                        const newCartItems = [...selectedOrder.cartItems];
-                        newCartItems[index].quantity = parseInt(e.target.value, 10);
-                        setSelectedOrder({ ...selectedOrder, cartItems: newCartItems });
-                      }}
-                    /> 
-                  </div>
-                ))}
-              </Form.Group>
-              <Form.Group controlId="formTotalPrice">
-                <Form.Label>Total Price</Form.Label>
-                <Form.Control
-                  type="number"
-                  value={selectedOrder.totalOrderPrice}
-                 onChange={(e) => setSelectedOrder({ ...selectedOrder, totalOrderPrice: parseFloat(e.target.value) })}
-                />
-              </Form.Group>
-              <Form.Group controlId="formDiscount">
-                <Form.Label>Discount</Form.Label>
-                <Form.Control
-                  type="number"
-                  value={selectedOrder.discount}
-                  onChange={(e) => setSelectedOrder({ ...selectedOrder, discount: parseFloat(e.target.value) })}
-                />
-              </Form.Group>
-              <Form.Group controlId="formTotalPriceAfterDiscount">
-                <Form.Label>Total Price After Discount</Form.Label>
-                <Form.Control
-                  type="number"
-                  value={selectedOrder.totalOrderPriceAfterDiscount}
-                 onChange={(e) => setSelectedOrder({ ...selectedOrder, totalOrderPriceAfterDiscount: parseFloat(e.target.value) })}
-                />
-              </Form.Group>
-              <Form.Group controlId="formPaymentMethod">
-                <Form.Label>Payment Method</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={selectedOrder.paymentMethod}
-                  onChange={(e) => setSelectedOrder({ ...selectedOrder, paymentMethod: e.target.value })}
-                />
-              </Form.Group>
-              <Form.Group controlId="formShippingAddress">
-                <Form.Label>Shipping Address</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={selectedOrder.shippingAddress}
-                  onChange={(e) => setSelectedOrder({ ...selectedOrder, shippingAddress: e.target.value })}
-                />
-              </Form.Group>
-              <Form.Group controlId="formIsPaid">
-                <Form.Check
-                  type="checkbox"
-                  label="Paid"
-                  checked={selectedOrder.isPaid}
-                  onChange={(e) => setSelectedOrder({ ...selectedOrder, isPaid: e.target.checked })}
-                />
-              </Form.Group>
-              <Form.Group controlId="formIsDelivered">
-                <Form.Check
-                  type="checkbox"
-                  label="Delivered"
-                  checked={selectedOrder.isDelivered}
-                  onChange={(e) => setSelectedOrder({ ...selectedOrder, isDelivered: e.target.checked })}
-                />
-              </Form.Group>
-            </Form>
-          )} */}
+          <Form.Group controlId="formSubcategoryCategory">
+            <Form.Label>Order Status</Form.Label>
+            <Form.Control
+              as="select"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option value="">Select Status</option>
+              {status.map((stat) => (
+                <option key={stat._id} value={stat._id}>
+                  {stat.name}
+                </option>
+              ))}
+            </Form.Control>
+          </Form.Group>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleModalClose}>

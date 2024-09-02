@@ -60,7 +60,10 @@ const StatusTd = styled(Td)`
   border-radius: 10px;
   padding: 8px 35px;
   display: inline-block;
-  margin-top:25.5px;
+  margin-top:22%;
+;
+
+
 `;
 
 const fadeIn = keyframes`

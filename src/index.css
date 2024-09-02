@@ -6,6 +6,9 @@
 body {
   overflow-x: hidden;
   background-image: url("./assets/Images/BG.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   height: 100%;
 }
 
@@ -570,10 +573,38 @@ font-family: "LufgaRegular";
 }
 .Header{
   color: #FFFFFF !important;
-  font-size: 33px !important;
+  font-size: 33px ;
   font-family: "LufgaSemiBold";
 }
 .welcome{
   font-family: "LufgaSemiBold" !important;
 
+}
+.pagetitle{
+  font-family: "LufgaSemiBold";
+
+}
+
+@media (min-width: 576px) {
+  .Header {
+    font-size: 28px !important; /* Adjust for small screens */
+  }
+}
+
+@media (min-width: 768px) {
+  .Header {
+    font-size: 30px; /* Adjust for medium screens */
+  }
+}
+
+@media (min-width: 992px) {
+  .Header {
+    font-size: 33px; /* Default size for large screens */
+  }
+}
+
+@media (min-width: 1200px) {
+  .Header {
+    font-size: 36px; /* Adjust for extra-large screens */
+  }
 }

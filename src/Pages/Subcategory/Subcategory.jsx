@@ -203,7 +203,7 @@ const SubcategoriesPage = () => {
     })
   }
   const getSubCategories = () =>{
-    axiosInstance.get('getallsubcategories')
+    axiosInstance.get('/getallsubcategories')
     .then((res) =>{
       setSubcategories(res.data.allSubCategories)
      console.log(res.data.allSubCategories)

@@ -5,6 +5,7 @@ import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axiosInstance from '../../axios';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const fadeIn = keyframes`
   from {
@@ -30,7 +31,7 @@ const Content = styled.div`
   margin-left: 250px; /* Adjust based on sidebar width */
   transition: margin-left 0.3s ease;
   animation: ${fadeIn} 0.6s ease-in-out;
-  
+
   @media (max-width: 768px) {
     margin-left: 60px; /* Adjust for mobile view */
   }
@@ -38,85 +39,87 @@ const Content = styled.div`
 
 const TableWrapper = styled.div`
   overflow-x: auto;
+  margin-top: 30px;
+  border-radius: 15px;
+  background-color: transparent;
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.03);
 `;
 
 const Table = styled.table`
   width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 15px;
   overflow: hidden;
+  background-color: transparent;
 `;
 
-const TableHeader = styled.th`
-  background-color: #007bff;
-  color: #ffffff;
-  padding: 12px;
+const Th = styled.th`
+  padding: 12px 20px;
   text-align: left;
+  border-bottom: 1px solid #ddd;
+  background-color: #FFFFFF;
+  color: #99A1B7;
+  font-family: "LufgaRegular";
+  font-size: 14px;
+  font-weight: bold;
 `;
 
-const TableData = styled.td`
-  padding: 12px;
-  border-bottom: 1px solid #dddddd;
+const Td = styled.td`
+  padding: 15px 20px;
+  border-bottom: 1px solid #FFFFFF;
+  color: #78829D;
+  font-size: 14px;
+  font-family: "LufgaRegular";
+  font-weight: 600;
   text-align: left;
+  background-color: transparent;
+
+  &:first-child {
+    border-left: 2px solid #FFFFFF;
+    padding-left: 10px;
+  }
+
   &:last-child {
-    border-right: none;
+    text-align: center;
+    padding-right: 5px;
+    color: black;
   }
 `;
 
-const TableRow = styled.tr`
-  transition: background-color 0.3s ease;
+const EditIcon = styled(FaEdit)`
+  font-size: 1.5rem;
+  color: black;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: color 0.3s ease;
+
   &:hover {
-    background-color: #f1f5f9;
+    color: #1D7A50;
   }
 `;
 
-const AddButton = styled.button`
-  padding: 10px 20px;
+const TrashIcon = styled(FaTrash)`
+  font-size: 1.5rem;
+  color: black;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #FF4C4C;
+  }
+`;
+
+const AddButton = styled(Button)`
   margin-bottom: 20px;
+  background-color: #007bff;
   border: none;
   border-radius: 6px;
-  cursor: pointer;
-  background-color: #007bff;
   color: white;
   font-size: 16px;
-  transition: background-color 0.3s ease;
-  
+
   &:hover {
     background-color: #0056b3;
-  }
-`;
-
-const EditButton = styled.button`
-  padding: 8px 12px;
-  margin: 0 5px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  background-color: #28a745;
-  color: #ffffff;
-  transition: background-color 0.3s ease;
-  
-  &:hover {
-    background-color: #218838;
-  }
-`;
-
-const DeleteButton = styled.button`
-  padding: 8px 12px;
-  margin: 0 5px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  background-color: #dc3545;
-  color: #ffffff;
-  transition: background-color 0.3s ease;
-  
-  &:hover {
-    background-color: #c82333;
   }
 `;
 
@@ -125,136 +128,134 @@ const UsersViewPage = () => {
   const [users, setUsers] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
-  const [roles, setRoles] =useState([])
-  const [editRoles , setEditRoles] =useState([])
+  const [roles, setRoles] = useState([]);
+  const [editRoles, setEditRoles] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   const handleEdit = (user) => {
-    console.log(user)
-    setEditRoles(user.roles.map(role => role._id))
+    setEditRoles(user.roles.map(role => role._id));
     setEditUser(user);
     setShowEditModal(true);
   };
 
   const handleDelete = (id) => {
-   
-    if( confirm('Are you Sure you want to delete this Admin')){
-      axiosInstance.delete(`/deleteuser/${id}`)
-      .then((res) =>{
-        setUsers(users.filter(user => user._id !== id));
+    setSelectedUserId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    axiosInstance.delete(`/deleteuser/${selectedUserId}`)
+      .then(() => {
+        setUsers(users.filter(user => user._id !== selectedUserId));
+        setShowDeleteModal(false);
       })
-      .catch((err) =>{
-      console.log(err)
-      })
-    }
-  
+      .catch((err) => {
+        console.error(err);
+        setShowDeleteModal(false);
+      });
   };
 
   const handleCloseEditModal = () => {
-    getAllAdmins()
+    getAllAdmins();
     setShowEditModal(false);
     setEditUser(null);
   };
 
   const handleSaveEdit = () => {
-    setEditUser({
-      ...editUser,
-      roleIds : editRoles,
+    axiosInstance.patch(`/updateuser/${editUser._id}`, {
+      userID: editUser._id,
+      name: editUser.name,
+      email: editUser.email,
+      phone: editUser.phone,
+      roleIds: editRoles,
+      isAdmin: 1
     })
-
-   axiosInstance.patch(`/updateuser/${editUser._id}`,{ userID : editUser._id,name :editUser.name , email : editUser.email, phone :editUser.phone ,roleIds :editRoles ,isAdmin: 1 } )
-   .then((res) =>{
-    console.log(res.data)
-    handleCloseEditModal();
-  })
-  .catch((err) =>{
-    alert(`Faild to add Admin : ${err.response.data.message}`)  
-  console.log(err)
-  })
-
-   
+      .then(() => {
+        handleCloseEditModal();
+      })
+      .catch((err) => {
+        alert(`Failed to update Admin: ${err.response.data.message}`);
+        console.error(err);
+      });
   };
-  useEffect(() => {
-    console.log(editUser);
-  }, [editUser]);
+
   const handleAddUser = () => {
     navigate('/addadmin');
   };
 
-  const handleChangeForTheCheckBox =  (e) => {
-    const { value , checked} = e.target;
-    if(checked){
-      setEditRoles([...editRoles,value])
-    }else {
-      setEditRoles([...editRoles.filter(role => role != value)])
+  const handleChangeForTheCheckBox = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setEditRoles([...editRoles, value]);
+    } else {
+      setEditRoles(editRoles.filter(role => role !== value));
     }
-    
-  }
+  };
 
-
-
-  const getAllRoles = () =>{
+  const getAllRoles = () => {
     axiosInstance.get('/allRoles')
-    .then((res) =>{
-      setRoles(res.data.roles)
-    })
-    .catch((err) =>{
-    console.log(err)
-    })
-  }
+      .then((res) => {
+        setRoles(res.data.roles);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
   const getAllAdmins = () => {
     axiosInstance.get('/getalladmins')
-    .then((res) =>{
-      setUsers(res.data.AllAdmins)
-      console.log(res.data.AllAdmins)
-    })
-    .catch((err) =>{
-    console.log(err)
-    })
-  }
-  useEffect(() =>{
-    getAllAdmins()
-    getAllRoles()
-  },[])
-  
+      .then((res) => {
+        setUsers(res.data.AllAdmins);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  useEffect(() => {
+    getAllAdmins();
+    getAllRoles();
+  }, []);
+
   return (
     <Container>
       <Sidebar />
       <Content>
-    
-        <h2 style={{ marginBottom: '20px' }}>Admins</h2>
+        <h2 className='pagetitle' style={{ marginBottom: '20px' }}>Admins</h2>
         <AddButton onClick={handleAddUser}>Add Admin</AddButton>
         <TableWrapper>
           <Table>
             <thead>
               <tr>
-                <TableHeader>ID</TableHeader>
-                <TableHeader>Name</TableHeader>
-                <TableHeader>Email</TableHeader>
-                <TableHeader>phone</TableHeader>
-                <TableHeader>roles</TableHeader>
-                <TableHeader>Actions</TableHeader>
+                <Th>ID</Th>
+                <Th>Name</Th>
+                <Th>Email</Th>
+                <Th>Phone</Th>
+                <Th>Roles</Th>
+                <Th style={{ textAlign: 'center' }}>Actions</Th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user,index) => (
-                <TableRow key={user._id}>
-                  <TableData>{index+1}</TableData>
-                  <TableData>{user.name}</TableData>
-                  <TableData>{user.email}</TableData>
-                  <TableData>{user.phone}</TableData>
-                  <TableData>{user.roles.map(role => role.name).join(' / ')}</TableData>
-                  <TableData>
-                    <EditButton onClick={() => handleEdit(user)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(user._id)}>Delete</DeleteButton>
-                  </TableData>
-                </TableRow>
+              {users.map((user, index) => (
+                <tr key={user._id}>
+                  <Td>{index + 1}</Td>
+                  <Td>{user.name}</Td>
+                  <Td>{user.email}</Td>
+                  <Td>{user.phone}</Td>
+                  <Td>{user.roles.map(role => role.name).join(' / ')}</Td>
+                  <Td>
+                    <EditIcon onClick={() => handleEdit(user)} />
+                    <TrashIcon onClick={() => handleDelete(user._id)} />
+                  </Td>
+                </tr>
               ))}
             </tbody>
           </Table>
         </TableWrapper>
 
         {/* Edit User Modal */}
-        <Modal show={showEditModal} onHide={handleCloseEditModal} animation={true}>
+        <Modal show={showEditModal} onHide={handleCloseEditModal}>
           <Modal.Header closeButton>
             <Modal.Title>Edit User</Modal.Title>
           </Modal.Header>
@@ -270,10 +271,10 @@ const UsersViewPage = () => {
                 />
               </Form.Group>
               <Form.Group controlId="formUserEmail">
-                <Form.Label>ُُEmail</Form.Label>
+                <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
-                  placeholder="Enter user Email"
+                  placeholder="Enter user email"
                   value={editUser?.email || ''}
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
                 />
@@ -281,25 +282,25 @@ const UsersViewPage = () => {
               <Form.Group controlId="formUserPhone">
                 <Form.Label>Phone</Form.Label>
                 <Form.Control
-                  type="phone"
+                  type="text"
                   placeholder="Enter user phone"
                   value={editUser?.phone || ''}
                   onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
                 />
               </Form.Group>
-              <Form.Group controlId="formUserEmail">
+              <Form.Group controlId="formUserRoles">
                 <Form.Label>Roles</Form.Label>
-                {  roles.map((role) => (
-                  <Form.Check // prettier-ignore 
-                  key={role._id}
-                  id={role.name}
-                  value={role._id}
-                  type='checkbox'
-                  checked={editRoles.includes(role._id)}
-                  label={role.name}
-                   onChange={handleChangeForTheCheckBox}
-                />
-              ))  }
+                {roles.map((role) => (
+                  <Form.Check
+                    key={role._id}
+                    id={role.name}
+                    value={role._id}
+                    type='checkbox'
+                    checked={editRoles.includes(role._id)}
+                    label={role.name}
+                    onChange={handleChangeForTheCheckBox}
+                  />
+                ))}
               </Form.Group>
             </Form>
           </Modal.Body>
@@ -309,6 +310,22 @@ const UsersViewPage = () => {
             </Button>
             <Button variant="primary" onClick={handleSaveEdit}>
               Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Delete User Modal */}
+        <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Delete</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Are you sure you want to delete this user?</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={confirmDelete}>
+              Delete
             </Button>
           </Modal.Footer>
         </Modal>
