@@ -5,7 +5,7 @@ import Sidebar from '../../component/sidebar/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axiosInstance from '../../axios';
-import { useAuth } from '../../store/authContext';
+import { FaEdit, FaTrash, FaSave } from 'react-icons/fa';
 
 const fadeIn = keyframes`
   from {
@@ -27,11 +27,10 @@ const Container = styled.div`
 const Content = styled.div`
   flex: 1;
   padding: 20px;
-  background-color: #f4f6f9;
   margin-left: 250px; /* Adjust based on sidebar width */
   transition: margin-left 0.3s ease;
   animation: ${fadeIn} 0.6s ease-in-out;
-  
+
   @media (max-width: 768px) {
     margin-left: 60px; /* Adjust for mobile view */
   }
@@ -39,96 +38,109 @@ const Content = styled.div`
 
 const TableWrapper = styled.div`
   overflow-x: auto;
+  margin-top: 30px;
+  border-radius: 15px;
+  background-color: transparent;
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.03);
 `;
 
 const Table = styled.table`
   width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 15px;
   overflow: hidden;
+  background-color: transparent;
 `;
 
-const TableHeader = styled.th`
-  background-color: #007bff;
-  color: #ffffff;
-  padding: 12px;
+const Th = styled.th`
+  padding: 12px 20px;
   text-align: left;
+  border-bottom: 1px solid #ddd;
+  background-color: #FFFFFF;
+  color: #99A1B7;
+  font-family: "LufgaRegular";
+  font-size: 14px;
+  font-weight: bold;
 `;
 
-const TableData = styled.td`
-  padding: 12px;
-  border-bottom: 1px solid #dddddd;
+const Td = styled.td`
+  padding: 15px 20px;
+  border-bottom: 1px solid #FFFFFF;
+  color: #78829D;
+  font-size: 14px;
+  font-family: "LufgaRegular";
+  font-weight: 600;
   text-align: left;
+  background-color: transparent;
+
+  &:first-child {
+    border-left: 2px solid #FFFFFF;
+    padding-left: 10px;
+  }
+
   &:last-child {
-    border-right: none;
+    text-align: center;
+    padding-right: 5px;
+    color: black;
   }
 `;
 
-const TableRow = styled.tr`
-  transition: background-color 0.3s ease;
+const EditIcon = styled(FaEdit)`
+  font-size: 1.5rem;
+  color: black;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: color 0.3s ease;
+
   &:hover {
-    background-color: #f1f5f9;
+    color: #1D7A50;
   }
 `;
 
-const AddButton = styled.button`
-  padding: 10px 20px;
+const TrashIcon = styled(FaTrash)`
+  font-size: 1.5rem;
+  color: black;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #FF4C4C;
+  }
+`;
+
+const SaveIcon = styled(FaSave)`
+  font-size: 1.5rem;
+  color: black;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #1D7A50;
+  }
+`;
+
+const AddButton = styled(Button)`
   margin-bottom: 20px;
+  background-color: #007bff;
   border: none;
   border-radius: 6px;
-  cursor: pointer;
-  background-color: #007bff;
   color: white;
   font-size: 16px;
-  transition: background-color 0.3s ease;
-  
+
   &:hover {
     background-color: #0056b3;
   }
 `;
 
-const EditButton = styled.button`
-  padding: 8px 12px;
-  margin: 0 5px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  background-color: #28a745;
-  color: #ffffff;
-  transition: background-color 0.3s ease;
-  
-  &:hover {
-    background-color: #218838;
-  }
-`;
-
-const DeleteButton = styled.button`
-  padding: 8px 12px;
-  margin: 0 5px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  background-color: #dc3545;
-  color: #ffffff;
-  transition: background-color 0.3s ease;
-  
-  &:hover {
-    background-color: #c82333;
-  }
-`;
-
 const BrandsPage = () => {
-
-  const {  hasPermissions } = useAuth();
-
   const navigate = useNavigate();
   const [brands, setBrands] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editBrand, setEditBrand] = useState({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedBrandId, setSelectedBrandId] = useState(null);
+  const [showSaveConfirmationModal, setShowSaveConfirmationModal] = useState(false);
 
   const handleEdit = (brand) => {
     setEditBrand(brand);
@@ -136,113 +148,108 @@ const BrandsPage = () => {
   };
 
   const handleDelete = (id) => {
-    axiosInstance.delete(`/deletebrand/${id}`)
-    .then((res) => {
-      console.log(res.data)
-      setBrands(brands.filter(brand => brand._id !== id));
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+    setSelectedBrandId(id);
+    setShowDeleteModal(true);
+  };
 
-    
+  const confirmDelete = () => {
+    axiosInstance.delete(`/deletebrand/${selectedBrandId}`)
+      .then((res) => {
+        console.log(res.data);
+        setBrands(brands.filter(brand => brand._id !== selectedBrandId));
+        setShowDeleteModal(false);
+        setShowSuccessModal(true); // Show success modal after deletion
+      })
+      .catch((err) => {
+        console.error(err);
+        setShowDeleteModal(false); // Close delete modal on error
+      });
   };
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
-    setEditBrand(null);
-    getAllBrands()
+    setEditBrand({});
+    getAllBrands();
   };
-  
+
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     setEditBrand({
       ...editBrand,
-      file : file
-    })
-   
-
+      file: file
+    });
   };
-  const handleSaveEdit = () => {
-    delete editBrand.image
-    delete editBrand.slug
-    delete editBrand.createdAt
-    delete editBrand.updatedAt
 
+  const handleSaveEdit = () => {
     const formData = new FormData();
     formData.append('file', editBrand.file);
     formData.append('title', editBrand.title);
-    axiosInstance.patch(`updatebrand/${editBrand._id}`,formData )
-    .then((res) => {
-      console.log(res.data);
-      handleCloseEditModal();
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-   
+    axiosInstance.patch(`updatebrand/${editBrand._id}`, formData)
+      .then((res) => {
+        console.log(res.data);
+        handleCloseEditModal();
+        setShowSaveConfirmationModal(true); // Show save confirmation modal after saving
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   const handleAddBrand = () => {
     navigate('/addbrand');
   };
-  const getAllBrands = () =>{
+
+  const getAllBrands = () => {
     axiosInstance.get('getallbrands')
-    .then((res) => {
+      .then((res) => {
         console.log(res.data.allBrands);
-        setBrands(res.data.allBrands)
+        setBrands(res.data.allBrands);
       })
       .catch((err) => {
         console.error(err);
       });
+  };
 
+  useEffect(() => {
+    getAllBrands();
+  }, []);
 
-  }
-
- 
-  useEffect(() =>{
-    getAllBrands()
-  },[])
   return (
-     <Container>
-   <Sidebar />
+    <Container>
+      <Sidebar />
       <Content>
-        <h2 style={{ marginBottom: '20px' }}>Brands</h2>
-      { hasPermissions(['create-brand']) && <AddButton onClick={handleAddBrand}>Add Brand</AddButton>}
+        <h2 className='pagetitle' style={{ marginBottom: '20px' }}>Brands</h2>
+        <AddButton onClick={handleAddBrand}>Add Brand</AddButton>
         <TableWrapper>
           <Table>
             <thead>
               <tr>
-                <TableHeader>Brand ID</TableHeader>
-                <TableHeader>Title</TableHeader>
-                <TableHeader>Logo</TableHeader>
-                <TableHeader>Actions</TableHeader>
+                <Th>Brand ID</Th>
+                <Th>Title</Th>
+                <Th>Logo</Th>
+                <Th style={{ textAlign: 'center' }}>Actions</Th>
               </tr>
             </thead>
             <tbody>
-              {brands?.map((brand,index) => (
-           
-                <TableRow key={brand._id}>
-                  <TableData>{index + 1}</TableData>
-                  <TableData>{brand.title}</TableData>
-                  <TableData>
+              {brands.map((brand, index) => (
+                <tr key={brand._id}>
+                  <Td>{index + 1}</Td>
+                  <Td>{brand.title}</Td>
+                  <Td>
                     <img src={`http://localhost:3000/uploads/${brand.image.replace('\\', '/')}`} alt={brand.title} style={{ width: '50px', height: 'auto' }} />
-                  </TableData>
-                  <TableData>
-
-                     {  hasPermissions(['update-brand']) && <EditButton onClick={() => handleEdit(brand)}>Edit</EditButton> }
-                   
-                   { hasPermissions(['delete-brand']) && <DeleteButton onClick={() => handleDelete(brand._id)}>Delete</DeleteButton>}
-                  </TableData>
-                </TableRow>
-                    
+                  </Td>
+                  <Td>
+                    <EditIcon onClick={() => handleEdit(brand)} />
+                    <TrashIcon onClick={() => handleDelete(brand._id)} />
+                  </Td>
+                </tr>
               ))}
             </tbody>
           </Table>
         </TableWrapper>
 
         {/* Edit Brand Modal */}
-        <Modal show={showEditModal} onHide={handleCloseEditModal} animation={true}>
+        <Modal show={showEditModal} onHide={handleCloseEditModal}>
           <Modal.Header closeButton>
             <Modal.Title>Edit Brand</Modal.Title>
           </Modal.Header>
@@ -257,32 +264,57 @@ const BrandsPage = () => {
                   onChange={(e) => setEditBrand({ ...editBrand, title: e.target.value })}
                 />
               </Form.Group>
-              
-              <Form.Group controlId="formBrandLogo">
-                {/* <FileInput
-                name='image'
-                  id="image"
-                  accept="image/*"
-                  // onChange={handleLogoChange}
-                  required
-                /> */}
 
-<Form.Label>Add Another logo</Form.Label>
-<Form.Control type="file"   name='image'
-                  
+              <Form.Group controlId="formBrandLogo">
+                <Form.Label>Add Another logo</Form.Label>
+                <Form.Control
+                  type="file"
+                  name='image'
                   accept="image/*"
                   onChange={handleLogoChange}
-                  />
+                />
               </Form.Group>
             </Form>
           </Modal.Body>
           <Modal.Footer>
-
             <Button variant="secondary" onClick={handleCloseEditModal}>
               Close
             </Button>
             <Button variant="primary" onClick={handleSaveEdit}>
-              Save Changes
+              <SaveIcon /> Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Confirm Delete Modal */}
+        <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Delete</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Are you sure you want to delete this brand?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Save Confirmation Modal */}
+        <Modal show={showSaveConfirmationModal} onHide={() => setShowSaveConfirmationModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Success</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Changes have been saved successfully!
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={() => setShowSaveConfirmationModal(false)}>
+              OK
             </Button>
           </Modal.Footer>
         </Modal>

@@ -1,0 +1,18 @@
+.barChartContainer {
+    width: 100%;
+    padding: 20px;
+    position: relative;
+    height: 400px;
+  }
+  
+
+
+
+  .barChartContainer {
+  position: relative;
+  padding: 20px;
+  background: transparent;
+  background-size: 50px 50px; /* Adjust size of stripes as needed */
+  border-radius: 10px;
+  overflow: hidden;
+}

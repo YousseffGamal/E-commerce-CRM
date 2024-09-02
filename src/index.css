@@ -4,8 +4,12 @@
 }
 
 body {
-  font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
   overflow-x: hidden;
+  background-image: url("./assets/Images/BG.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
 }
 
 img {
@@ -533,4 +537,74 @@ ul {
 input[type="text"],
 input[type="checkbox"] {
   margin-bottom: 10px;
+}
+
+/* fonts */
+@font-face {
+  font-family:"LufgaRegular";
+  src: url("./assets/Fonts/Lufga/LufgaRegular.ttf");
+}
+
+@font-face {
+  font-family:"LufgaSemiBold";
+  src: url("./assets/Fonts/Lufga/LufgaSemiBold.ttf");
+}
+
+/* sidebar */
+.SideLinks{
+  color: #FFFFFF;
+  font-size: 17px;
+  font-family: "LufgaRegular";
+}
+.Icons{
+  color: #FFFFFF;
+  font-size: 17px;
+}
+.CardNumber {
+color: #191919 !important;   
+font-size: 58px !important;
+font-family: "LufgaRegular";
+
+}
+.CardTitle{
+  color: #000000 !important;   
+font-size: 17px !important;
+font-family: "LufgaRegular";
+}
+.Header{
+  color: #FFFFFF !important;
+  font-size: 33px ;
+  font-family: "LufgaSemiBold";
+}
+.welcome{
+  font-family: "LufgaSemiBold" !important;
+
+}
+.pagetitle{
+  font-family: "LufgaSemiBold";
+
+}
+
+@media (min-width: 576px) {
+  .Header {
+    font-size: 28px !important; /* Adjust for small screens */
+  }
+}
+
+@media (min-width: 768px) {
+  .Header {
+    font-size: 30px; /* Adjust for medium screens */
+  }
+}
+
+@media (min-width: 992px) {
+  .Header {
+    font-size: 33px; /* Default size for large screens */
+  }
+}
+
+@media (min-width: 1200px) {
+  .Header {
+    font-size: 36px; /* Adjust for extra-large screens */
+  }
 }

@@ -7,6 +7,8 @@ import { FaTasks, FaBoxes, FaDollarSign, FaMoneyBillWave } from 'react-icons/fa'
 import CountUp from 'react-countup';
 import styled from 'styled-components';
 import { Modal, Button, Form } from 'react-bootstrap';
+import BarChart from "../../component/BarChart/BarChart";
+
 
 const AppContainer = styled.div`
   display: flex;
@@ -28,13 +30,15 @@ const BoxContainer = styled.div`
 `;
 
 const Box = styled.div`
-  background-color: #f8f9fa;
+  background-color: transparent;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 25px;
+  border: 1px solid #000000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex: 1;
   margin-right: 20px;
   text-align: center;
+  
 `;
 
 const Icon = styled.div`
@@ -99,13 +103,20 @@ function CRM() {
     const { name, value } = e.target;
     setCurrentProduct({ ...currentProduct, [name]: value });
   };
-
+  const barChartData = [
+    { month: "Jan", value: 30 },
+    { month: "Feb", value: 45 },
+    { month: "Mar", value: 60 },
+    { month: "Apr", value: 75 },
+    { month: "May", value: 90 },
+    { month: "Jun", value: 105 },
+  ];
   return (
     <AppContainer>
       <Sidebar />
       <Content className="container-fluid">
         <Header>
-          <Title style={{ fontSize: "2rem", color: "#000", margin: "0", fontWeight: "bold" }}>CRM Dashboard</Title>
+          <Title className='welcome' style={{ fontSize: "3rem", color: "#000", margin: "0",  }}> Welcome Back !</Title>
           <div>
             {/* Any additional header content goes here */}
           </div>
@@ -113,30 +124,36 @@ function CRM() {
         <div className="row">
           <BoxContainer className='Coll'>
             <Box className='col-md-3'>
-              <Icon><FaTasks /></Icon>
-              <Title>Ongoing Orders</Title>
-              <Value><CountUp end={5} duration={5} /></Value>
+            <Value className='CardNumber'><CountUp end={5} duration={5} /></Value>
+
+              {/* <Icon><FaTasks /></Icon> */}
+              <Title className='CardTitle'>Ongoing Orders</Title>
             </Box>
             <Box className='col-md-3'>
-              <Icon><FaBoxes /></Icon>
-              <Title>Total Products in Stock</Title>
-              <Value><CountUp end={150} duration={5} /></Value>
+            <Value className='CardNumber'><CountUp end={150} duration={5} /></Value>
+
+              {/* <Icon><FaBoxes /></Icon> */}
+              <Title className='CardTitle'>Total Products in Stock</Title>
             </Box>
             <Box className='col-md-3'>
-              <Icon><FaDollarSign /></Icon>
-              <Title>Total Stock Value</Title>
-              <Value><CountUp end={5000} duration={5} prefix="$" separator="," /></Value>
+              {/* <Icon><FaDollarSign /></Icon> */}
+              <Value className='CardNumber'><CountUp end={5000} duration={5} prefix="$" separator="," /></Value>
+
+              <Title className='CardTitle'>Total Stock Value</Title>
             </Box>
             <Box className='col-md-3'>
-              <Icon><FaMoneyBillWave /></Icon>
-              <Title>Savings from Promotions</Title>
-              <Value><CountUp end={200} duration={5} prefix="$" separator="," /></Value>
+              {/* <Icon><FaMoneyBillWave /></Icon> */}
+              <Value className='CardNumber'><CountUp end={200} duration={5} prefix="$" separator="," /></Value>
+
+              <Title className='CardTitle'>Savings from Promotions</Title>
             </Box>
           </BoxContainer>
         </div>
         <div className="row">
           <div className="col-md mt-3">
-            <Charts />
+          <div className='barChartWrapper'>
+              <BarChart data={barChartData} />
+            </div>
             <ProductTable products={products} onEdit={handleEdit} />
           </div>
         </div>

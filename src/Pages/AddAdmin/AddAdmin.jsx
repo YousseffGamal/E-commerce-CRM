@@ -25,7 +25,6 @@ const Content = styled.div`
   flex: 1;
   padding: 20px;
   margin-left: 250px; /* Adjust based on sidebar width */
-  background-color: #f4f6f9;
   animation: ${fadeIn} 0.6s ease-in-out;
   transition: margin-left 0.3s ease;
   
