@@ -79,7 +79,7 @@ const Orders = () => {
     const query = statusIDs.length ? `/orders?statusIDs=${statusIDs.join(',')}` : '/orders';
     axiosInstance.get(query)
       .then((res) => {
-        console.log(res.data);
+        console.log("products comeing form the backend ",res.data);
         setOrders(res.data);
       })
       .catch((err) => {
@@ -173,12 +173,12 @@ const Orders = () => {
             </thead>
             <tbody>
               {orders?.map((order,index) => (
-                <tr key={order._id}>
+                <tr key={index +1}>
                   <td>{index +1}</td>
                   <td>{order.user.name}</td>
                   <td>
-                    {order.cartItems.map(item => (
-                      <div key={item.productId._id}>{item.productId.title}</div>
+                    {order?.cartItems?.map(item => (
+                      <div key={item.product._id}>{item.product.title}</div>
                     ))}
                   </td>
                   <td>{order.cartItems.reduce((total, item) => total + item.quantity, 0)}</td>
@@ -194,7 +194,7 @@ const Orders = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )) }
             </tbody>
           </Table>
         </div>
