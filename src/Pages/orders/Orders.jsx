@@ -94,8 +94,8 @@ const StatusTd = styled(Td)`
 `;
 
 const EditIcon = styled(FaEdit)`
-  font-size: 1.25rem;
-  color: #299C61;
+  font-size:2rem;
+  color: black;
   cursor: pointer;
   margin: 25px 0;
   transition: color 0.3s ease;
