@@ -4,8 +4,9 @@
 }
 
 body {
-  font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
   overflow-x: hidden;
+  background-image: url("./assets/Images/BG.png");
+  height: 100%;
 }
 
 img {
@@ -533,4 +534,46 @@ ul {
 input[type="text"],
 input[type="checkbox"] {
   margin-bottom: 10px;
+}
+
+/* fonts */
+@font-face {
+  font-family:"LufgaRegular";
+  src: url("./assets/Fonts/Lufga/LufgaRegular.ttf");
+}
+
+@font-face {
+  font-family:"LufgaSemiBold";
+  src: url("./assets/Fonts/Lufga/LufgaSemiBold.ttf");
+}
+
+/* sidebar */
+.SideLinks{
+  color: #FFFFFF;
+  font-size: 20px;
+  font-family: "LufgaRegular";
+}
+.Icons{
+  color: #FFFFFF;
+  font-size: 20px;
+}
+.CardNumber {
+color: #191919 !important;   
+font-size: 88px !important;
+font-family: "LufgaRegular";
+
+}
+.CardTitle{
+  color: #000000 !important;   
+font-size: 28px !important;
+font-family: "LufgaRegular";
+}
+.Header{
+  color: #FFFFFF !important;
+  font-size: 33px !important;
+  font-family: "LufgaSemiBold";
+}
+.welcome{
+  font-family: "LufgaSemiBold" !important;
+
 }

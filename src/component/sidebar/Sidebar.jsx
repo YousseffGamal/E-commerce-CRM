@@ -9,17 +9,19 @@ import { useAuth } from '../../store/authContext';
 const SidebarContainer = styled.div`
   width: 250px;
   height: 100vh;
-  background-color: #203648;
+  background-color: #23272e;
   color: #ecf0f1;
   display: flex;
   flex-direction: column;
   position: fixed;
   top: 0;
   left: 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Add box-shadow */
   @media (max-width: 768px) {
     width: 60px;
   }
 `;
+
 
 const SidebarHeader = styled.h1`
   padding: 20px;
@@ -74,16 +76,16 @@ const Button = styled.button`
   border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
-  color: #ffffff;
+  color: #dc3545;
   transition: background-color 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${(props) => props.primary ? '#007bff' : '#dc3545'};
+  border:1px solid #dc3545;
+  
+  background-color: ${(props) => props.primary ? '#007bff' : ' transparent'};
 
-  &:hover {
-    background-color: ${(props) => props.primary ? '#0056b3' : '#c82333'};
-  }
+ 
 `;
 
 const Sidebar = () => {
@@ -102,17 +104,17 @@ const Sidebar = () => {
 
   return (
     <SidebarContainer>
-      <SidebarHeader>CRM</SidebarHeader>
+      <SidebarHeader className='Header' style={{color:"#000000"}}>CRM</SidebarHeader>
      <MenuItem>
       <StyledLink to="/CRM">
-        <FaHome />
-        <MenuText>Dashboard</MenuText>
+        <FaHome className='Icons' />
+        <MenuText  className='SideLinks'>Dashboard</MenuText>
       </StyledLink>
     </MenuItem>
    { hasPermissions(['read-order','update-order','create-order','delete-order']) && <MenuItem>
         <StyledLink to="/orders">
-          <FaShoppingCart />
-          <MenuText>Orders</MenuText>
+          <FaShoppingCart className='Icons' />
+          <MenuText className='SideLinks'>Orders</MenuText>
         </StyledLink>
       </MenuItem>}
       {/* <MenuItem>
@@ -123,20 +125,20 @@ const Sidebar = () => {
       </MenuItem> */}
   {    hasPermissions(['read-product','update-product','create-product','delete-product']) &&    <MenuItem>
             <StyledLink to="/products">
-              <FaEdit />
-              <MenuText>Products</MenuText>
+              <FaEdit className='Icons' />
+              <MenuText className='SideLinks'>Products</MenuText>
             </StyledLink>
           </MenuItem>}
       {  hasPermissions(['read-role','update-role','create-role','delete-role']) &&   <MenuItem>
         <StyledLink to="/roles">
-          <FaUserPlus />
-          <MenuText>Roles</MenuText>
+          <FaUserPlus className='Icons' />
+          <MenuText className='SideLinks'>Roles</MenuText>
         </StyledLink>
       </MenuItem>}
      {  hasPermissions(['read-brand','update-brand','create-brand','delete-brand']) && <MenuItem>
-        <StyledLink to="/brand">
-          <FaTag />
-          <MenuText>Brand</MenuText>
+        <StyledLink  to="/brand">
+          <FaTag className='Icons' />
+          <MenuText className='SideLinks'>Brand</MenuText>
         </StyledLink>
       </MenuItem>}
       {/* <MenuItem>
@@ -147,20 +149,20 @@ const Sidebar = () => {
       </MenuItem> */}
       { hasPermissions(['read-category','update-category','create-category','delete-category']) && <MenuItem>
         <StyledLink to="/category">
-          <FaTag />
-          <MenuText>Categorys</MenuText>
+          <FaTag className='Icons' />
+          <MenuText  className='SideLinks'>Categorys</MenuText>
         </StyledLink>
       </MenuItem>}
      { hasPermissions(['read-subCategory','update-subCategory','create-subCategory','delete-subCategory']) && <MenuItem>
         <StyledLink to="/subcategory">
-          <FaTag />
-          <MenuText>Subcategory</MenuText>
+          <FaTag className='Icons' />
+          <MenuText className='SideLinks'>Subcategory</MenuText>
         </StyledLink>
       </MenuItem>}
       { hasPermissions(['read-user','update-user','create-user','delete-user']) && <MenuItem>
         <StyledLink to="/usersview">
-          <FaUsers />
-          <MenuText>Admins</MenuText>
+          <FaUsers className='Icons' />
+          <MenuText className='SideLinks'>Admins</MenuText>
         </StyledLink>
       </MenuItem>}
       {/* <MenuItem>
@@ -172,7 +174,6 @@ const Sidebar = () => {
 
       <ButtonContainer>
         <Button onClick={handleLogOut}>Logout</Button>
-        <Button onClick={handleclick}>Test</Button>
       </ButtonContainer>
     </SidebarContainer>
   );
