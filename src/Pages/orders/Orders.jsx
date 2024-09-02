@@ -9,15 +9,17 @@ import { FaEdit } from 'react-icons/fa';  // Importing the edit icon
 
 const AppContainer = styled.div`
   display: flex;
+  height: 100vh;  // Full viewport height
+  overflow: hidden;  // Prevent scrolling outside the container
 `;
 
 const Content = styled.div`
   flex: 1;
-    height: 100vh;  // Full viewport height
-
   margin-left: 250px;
   padding: 20px;
   background-color: transparent;
+  height: 100vh;  // Full viewport height
+  overflow-y: auto;  // Enable vertical scrolling if content overflows
   @media (max-width: 768px) {
     margin-left: 60px;
   }
@@ -92,8 +94,8 @@ const StatusTd = styled(Td)`
 `;
 
 const EditIcon = styled(FaEdit)`
-  font-size: 2rem;
-  color: black;
+  font-size: 1.25rem;
+  color: #299C61;
   cursor: pointer;
   margin: 25px 0;
   transition: color 0.3s ease;
@@ -200,35 +202,34 @@ const Orders = () => {
               </tr>
             </thead>
             <tbody>
-  {orders.length ? (
-    orders.map((order, index) => (
-      <tr key={order._id}>
-        <Td style={{ color: '#071437' }}>{index + 1}</Td>
-        <Td>{order.user?.name || 'N/A'}</Td>
-        <Td>
-          {order.cartItems?.map(item => (
-            item.product ? <div key={item.product._id}>{item.product.title}</div> : 'Unknown Product'
-          ))}
-        </Td>
-        <Td>{order.cartItems?.reduce((total, item) => total + item.quantity, 0) || 0}</Td>
-        <Td>${order.totalOrderPrice || 0}</Td>
-        <Td>{order.discount || 0}%</Td>
-        <Td>${order.totalOrderPriceAfterDiscount || 0}</Td>
-        <Td>{order.paymentMethod || 'N/A'}</Td>
-        <Td>{order.shippingAddress || 'N/A'}</Td>
-        <StatusTd $status={order.status?.name || 'Default'}>{order.status?.name || 'Unknown'}</StatusTd>
-        <Td>
-          <EditIcon onClick={() => handleUpdateOrder(order)} />
-        </Td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <Td colSpan="12">No orders available</Td>
-    </tr>
-  )}
-</tbody>
-
+              {orders.length ? (
+                orders.map((order, index) => (
+                  <tr key={order._id}>
+                    <Td style={{ color: '#071437' }}>{index + 1}</Td>
+                    <Td>{order.user?.name || 'N/A'}</Td>
+                    <Td>
+                      {order.cartItems?.map(item => (
+                        item.product ? <div key={item.product._id}>{item.product.title}</div> : 'Unknown Product'
+                      ))}
+                    </Td>
+                    <Td>{order.cartItems?.reduce((total, item) => total + item.quantity, 0) || 0}</Td>
+                    <Td>${order.totalOrderPrice || 0}</Td>
+                    <Td>{order.discount || 0}%</Td>
+                    <Td>${order.totalOrderPriceAfterDiscount || 0}</Td>
+                    <Td>{order.paymentMethod || 'N/A'}</Td>
+                    <Td>{order.shippingAddress || 'N/A'}</Td>
+                    <StatusTd $status={order.status?.name || 'Default'}>{order.status?.name || 'Unknown'}</StatusTd>
+                    <Td>
+                      <EditIcon onClick={() => handleUpdateOrder(order)} />
+                    </Td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <Td colSpan="12">No orders available</Td>
+                </tr>
+              )}
+            </tbody>
           </Table>
         </TableContainer>
       </Content>
