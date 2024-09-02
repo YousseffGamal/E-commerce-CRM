@@ -219,7 +219,7 @@ const SubcategoriesPage = () => {
                 <Th>ID</Th>
                 <Th>Title</Th>
                 <Th>Category</Th>
-                <Th>Actions</Th>
+                <Th style={{textAlign:"centerd"}}>Actions</Th>
               </tr>
             </thead>
             <tbody>
