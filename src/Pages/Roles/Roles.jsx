@@ -27,7 +27,6 @@ const Container = styled.div`
 const Content = styled.div`
   flex: 1;
   padding: 20px;
-  background-color: #f4f6f9;
   margin-left: 250px; /* Adjust based on sidebar width */
   transition: margin-left 0.3s ease;
   animation: ${fadeIn} 0.6s ease-in-out;
