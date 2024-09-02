@@ -579,7 +579,7 @@ console.log(" -->>>>" ,formData );
             <FormGroup>
               <Label htmlFor="color">color:</Label>
               <Input
-                type="text"
+                type="color"
                 id="color"
                 value={color}
                 onChange={(e) => handleInputChange(e, setColor)}
