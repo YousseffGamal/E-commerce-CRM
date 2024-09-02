@@ -27,7 +27,7 @@ const Th = styled.th`
   background-color: #FFFFFF;
   color: #99A1B7;
   font-family: "LufgaRegular";
-  font-size: 21.7px;
+  font-size: 17.7px;
   font-weight: bold;
 `;
 
@@ -35,7 +35,7 @@ const Td = styled.td`
   padding: 33.5px 40px;
   border-bottom: 1px solid #FFFFFF;
   color: #78829D;
-  font-size: 21.7px;
+  font-size: 17.7px;
   font-family: "LufgaRegular";
   font-weight: 600;
   text-align: left;
