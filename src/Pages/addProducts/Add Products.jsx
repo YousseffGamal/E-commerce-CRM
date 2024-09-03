@@ -630,15 +630,16 @@ console.log(" -->>>>" ,formData );
           </Form>
         </StyledFormContainer>
       </div>
-      <div style={{ marginTop: '30px', marginRight: '25px' }}>
+      <div style={{ marginTop: '30px' , marginRight: '200px' , width: '450px'}}>
+
 <PreviewContainer >
           <h3>Preview Section</h3>
           <p><strong>Title:</strong> {title}</p>
           <p><strong>Price:</strong> {price}</p>
           <p><strong>Description:</strong> {description}</p>
-          <p><strong>Category:</strong> {categories.find(cat => cat._id === category)?.name}</p>
-          <p><strong>Sub-Category:</strong> {subCat.find(sub => sub._id === subCategory)?.name}</p>
-          <p><strong>Brand:</strong> {brands.find(br => br._id === brand)?.name}</p>
+          {/* <p><strong>Category:</strong> {categories.find(cat => cat._id === category)?.name}</p> */}
+          {/* <p><strong>Sub-Category:</strong> {subCat.find(sub => sub._id === subCategory)?.name}</p> */}
+          {/* <p><strong>Brand:</strong> {brands.find(br => br._id === brand)?.name}</p> */}
           <p><strong>Material:</strong> {material}</p>
           <p><strong>Discount:</strong> {discount}%</p>
           <p><strong>Price After Discount:</strong> {priceAfterDiscount}</p>
@@ -647,7 +648,7 @@ console.log(" -->>>>" ,formData );
             <div key={index}>
               <strong>Size:</strong> {item.size}
               {item.variants.map((variant, variantIndex) => (
-                <div key={variantIndex} style={{ paddingLeft: '20px' }}>
+                <div key={variantIndex} style={{ paddingLeft: '10px' }}>
                   <strong>Color:</strong> {variant.color}, <strong>Stock:</strong> {variant.stock}
                 </div>
               ))}
