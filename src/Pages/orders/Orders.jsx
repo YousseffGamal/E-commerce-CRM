@@ -127,8 +127,6 @@ const Orders = () => {
     const query = statusIDs.length ? `/orders?statusIDs=${statusIDs.join(',')}` : '/orders';
     axiosInstance.get(query)
       .then((res) => {
-        console.log("products comeing form the backend ",res.data);
-
         setOrders(res.data);
       })
       .catch((err) => {
@@ -204,31 +202,6 @@ const Orders = () => {
               </tr>
             </thead>
             <tbody>
-
-              {orders?.map((order,index) => (
-                <tr key={index +1}>
-                  <td>{index +1}</td>
-                  <td>{order.user.name}</td>
-                  <td>
-                    {order?.cartItems?.map(item => (
-                      <div key={item.product._id}>{item.product.title}</div>
-                    ))}
-                  </td>
-                  <td>{order.cartItems.reduce((total, item) => total + item.quantity, 0)}</td>
-                  <td>${order.totalOrderPrice}</td>
-                  <td>{order.discount}%</td>
-                  <td>${order.totalOrderPriceAfterDiscount}</td>
-                  <td>{order.paymentMethod}</td>
-                  <td>{order.shippingAddress}</td>
-                  <td>{order.status.name}</td>
-                  <td>
-                    <button className="btn btn-primary btn-sm" onClick={() => handleUpdateOrder(order)}>
-                      Update Status
-                    </button>
-                  </td>
-                </tr>
-              )) }
-
               {orders.length ? (
                 orders.map((order, index) => (
                   <tr key={order._id}>
@@ -246,9 +219,9 @@ const Orders = () => {
                     <Td>{order.paymentMethod || 'N/A'}</Td>
                     <Td>{order.shippingAddress || 'N/A'}</Td>
                     <StatusTd $status={order.status?.name || 'Default'}>{order.status?.name || 'Unknown'}</StatusTd>
-                    <Td>
+                    { order.status?.name != 'canceled' && <Td>
                       <EditIcon onClick={() => handleUpdateOrder(order)} />
-                    </Td>
+                    </Td>}
                   </tr>
                 ))
               ) : (
@@ -256,7 +229,6 @@ const Orders = () => {
                   <Td colSpan="12">No orders available</Td>
                 </tr>
               )}
-
             </tbody>
           </Table>
         </TableContainer>

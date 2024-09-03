@@ -5,6 +5,7 @@ import axiosInstance from '../../axios';
 import Sidebar from '../../component/sidebar/Sidebar';
 import { useAuth } from '../../store/authContext';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'; // Importing the edit and delete icons
+import { useNavigate } from 'react-router-dom';
 
 const AppContainer = styled.div`
   display: flex;
@@ -135,7 +136,7 @@ const SubcategoriesPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showSaveConfirmationModal, setShowSaveConfirmationModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-
+  const navigate = useNavigate()
   const handleEdit = (subcategory) => {
     getCategories();
     setEditSubcategory(subcategory);
