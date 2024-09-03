@@ -614,3 +614,35 @@ font-family: "LufgaRegular";
   background-color: #ffffff !important;
   background-image: none !important;
 }
+
+.image-containerrr {
+  position: relative;
+}
+
+.mainn {
+  height: 100%;
+  max-height: 617px;
+  max-width: 475px;
+  width: 100%;
+}
+
+.thumbnail-container {
+  display: flex !important;
+  gap: 10px; /* Space between thumbnails */
+  margin-top: 10px;
+}
+
+.thumbnail-image {
+  height: 100%;
+  max-height: auto; /* Adjust based on the desired thumbnail size */
+  max-width: 250px; /* Adjust based on the desired thumbnail size */
+  width: 100%;
+}
+
+.finalbtn{
+  margin-top: 10px;
+  border: 1px solid #007bff !important;
+  font-size: 20px !important;
+  font-family: "LufgaSemiBold" !important;
+
+}

@@ -122,6 +122,8 @@ const PreviewContainer = styled.div`
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
   animation: ${fadeIn} 0.5s ease;
   width: 100%;
+    height:100%;
+
 `;
 
 // const ProductImage = styled.img`
@@ -627,11 +629,11 @@ console.log(" -->>>>" ,formData );
               />
             </FormGroup>
 
-            <Button type="button" onClick={addColorsStock}>
+            <Button className='finalbtn' type="button" onClick={addColorsStock}>
               Add color/Stock 
             </Button>
 
-            <Button type="button" onClick={addSizecolorsStock}>
+            <Button className='finalbtn' type="button" onClick={addSizecolorsStock}>
               Add Size/color/Stock
             </Button>
             
@@ -656,7 +658,7 @@ console.log(" -->>>>" ,formData );
     </div>
   ))}
 </div>
-            <Button type="submit">Submit</Button>
+            <Button className='finalbtn' type="submit">Submit</Button>
             
           </Form>
         </StyledFormContainer>
@@ -669,8 +671,29 @@ console.log(" -->>>>" ,formData );
         <PreviewContainer className='asd' >
         <div className="row">
         <div className="col-md">
-            {imagePreview && <ProductImage style={{height:"100%",maxHeight:"617px",maxWidth:"475px",width:"100%"}} src={imagePreview} alt="Product Preview" />}
+    {imagePreview && (
+        <div className="image-containerrr">
+            <ProductImage
+                className="mainn"
+                src={imagePreview[0]}
+                alt="Product Preview"
+                style={{ height: "100%", maxHeight: "617px", maxWidth: "475px", width: "100%" }}
+            />
+            <div className="thumbnail-container">
+                {imagePreview.slice(1).map((src, index) => (
+                    <ProductImage
+                        key={index}
+                        className="thumbnail-image"
+                        src={src}
+                        alt={`Thumbnail ${index + 1}`}
+                        style={{ height: "100%", maxHeight: "150px", maxWidth: "150px", width: "100%" }}
+                    />
+                ))}
+            </div>
         </div>
+    )}
+</div>
+
         <div className="col-md">
           <h3>Preview Section</h3>
         
@@ -681,17 +704,32 @@ console.log(" -->>>>" ,formData );
           <p><strong>Material:</strong> {material}</p>
           <p><strong>Discount:</strong> {discount}%</p>
           <p><strong>Price After Discount:</strong> {priceAfterDiscount}</p>
-          <p><strong>Size/Color/Stock Combinations:</strong></p>
-          {SizecolorsStock.map((item, index) => (
-            <div key={index}>
-              <strong>Size:</strong> {item.size}
-              {item.variants.map((variant, variantIndex) => (
-                <div key={variantIndex} style={{ paddingLeft: '20px' }}>
-                  <strong>Color:</strong> {variant.color}, <strong>Stock:</strong> {variant.stock}
-                </div>
-              ))}
-            </div>
-          ))}
+{SizecolorsStock.map((item, index) => (
+  <div key={index}>
+    <strong>Size:</strong> {item.size}
+    {item.variants.map((variant, variantIndex) => (
+      <div
+        key={variantIndex}
+        style={{
+          paddingLeft: '20px',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
+        <div
+          style={{
+            width: '20px',
+            height: '20px',
+            backgroundColor: variant.color,
+            marginRight: '10px',
+            border: '1px solid #ccc' // Optional: to add a border around the color box
+          }}
+        ></div>
+      </div>
+    ))}
+  </div>
+))}
+
           {/* <ImagesContainer>
             {imagePreview.map((img, index) => (
               <ProductImage key={index} src={img} alt={`Preview ${index + 1}`} />
