@@ -466,7 +466,7 @@ console.log(" -->>>>" ,formData );
   return (
     <Container >
       <Sidebar />
-      <div style={{ display: 'flex', width: '100%', padding: '20px' }}>
+      <div className='rrr' style={{ display: 'flex', width: '100%', padding: '20px' }}>
         <StyledFormContainer isFormActive={isFormActive}>
           <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Add Product</h2>
           <Form onSubmit={handleSubmit}>
@@ -590,23 +590,6 @@ console.log(" -->>>>" ,formData );
     ))}
   </ImagePreviewContainer>
 </FormGroup>
-            {/* <FormGroup>
-    <Label htmlFor="images">Images:</Label>
-    <Input type="file" id="images" onChange={handleImageChange} multiple />
-      {imagePreview.map((src, index) => (
-          <ProductImage key={index} src={src} alt={`Preview ${index + 1}`} />
-      ))}
-</FormGroup> */}
-            {/* <FormGroup>
-              <Label htmlFor="size">Size:</Label>
-              <Input
-                type="text"
-                id="size"
-                value={size}
-                onChange={(e) => handleInputChange(e, setSize)}
-                
-              />
-            </FormGroup> */}
             <FormGroup>
             <Label htmlFor="size">Choose a size:</Label>
             <Select id="size" value={size} onChange={(e) => setSize(e.target.value)}>
@@ -681,25 +664,20 @@ console.log(" -->>>>" ,formData );
       
       
       {isFormActive && (
-      <div >
-      {/* style={{ marginTop: '30px' , marginRight: '200px' , width: '450px'}} */}
-        <PreviewContainer >
+     
+
+        <PreviewContainer className='asd' >
         <div className="row">
         <div className="col-md">
             {imagePreview && <ProductImage style={{height:"100%",maxHeight:"617px",maxWidth:"475px",width:"100%"}} src={imagePreview} alt="Product Preview" />}
         </div>
-
-          <h3>Preview Section</h3>
         <div className="col-md">
+          <h3>Preview Section</h3>
+        
           <p><strong>Title:</strong> {title}</p>
           <p><strong>Price:</strong> {price}</p>
           <p><strong>Description:</strong> {description}</p>
 
-          {/* {categories.find(cat => cat._id === category)?.name}
-          <p><strong>Category:</strong> {category}</p>
-
-          <p><strong>Sub-Category:</strong> {subCat.find(sub => sub._id === subCategory)?.name}</p>
-          <p><strong>Brand:</strong> {brands.find(br => br._id === brand)?.name}</p> */}
           <p><strong>Material:</strong> {material}</p>
           <p><strong>Discount:</strong> {discount}%</p>
           <p><strong>Price After Discount:</strong> {priceAfterDiscount}</p>
@@ -722,7 +700,7 @@ console.log(" -->>>>" ,formData );
           </div>
           </div>
         </PreviewContainer>
-</div>
+
 
  )}
  

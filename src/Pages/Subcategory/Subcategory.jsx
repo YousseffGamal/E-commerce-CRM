@@ -136,7 +136,6 @@ const SubcategoriesPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showSaveConfirmationModal, setShowSaveConfirmationModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const navigate = useNavigate()
   const handleEdit = (subcategory) => {
     getCategories();
     setEditSubcategory(subcategory);
