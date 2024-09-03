@@ -136,7 +136,7 @@ const SubcategoriesPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showSaveConfirmationModal, setShowSaveConfirmationModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-
+  const navigate = useNavigate()
   const handleEdit = (subcategory) => {
     getCategories();
     setEditSubcategory(subcategory);
@@ -221,7 +221,7 @@ const SubcategoriesPage = () => {
                 <Th>ID</Th>
                 <Th>Title</Th>
                 <Th>Category</Th>
-                <Th style={{textAlign:"centerd"}}>Actions</Th>
+                <Th style={{textAlign:"center"}}>Actions</Th>
               </tr>
             </thead>
             <tbody>
