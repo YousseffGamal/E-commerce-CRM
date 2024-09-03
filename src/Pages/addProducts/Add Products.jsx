@@ -159,6 +159,7 @@ const AddProductForm = () => {
   const [color, setColor] = useState('');
   const [stock, setStock] = useState('');
   const [material, setMaterial] = useState(''); // Added missing material state
+  const [activeImage, setActiveImage] = useState(imagePreview[0] || '');
 
   useEffect(() => {
     const allFieldsEmpty = !title && !price && !description && imagePreview.length === 0;
@@ -218,7 +219,11 @@ const AddProductForm = () => {
       setSubCategory('default');
     }
   }, [category]);
-
+  useEffect(() => {
+    if (imagePreview.length > 0) {
+        setActiveImage(imagePreview[0]);
+    }
+}, [imagePreview]);
   const handleImageChange = (e) => {
     // const filesArray = Array.from(e.target.files); // Convert FileList to array
     // console.log('filesArray:', filesArray);  // Log the length of files array
@@ -237,7 +242,7 @@ const AddProductForm = () => {
       };
       reader.readAsDataURL(file);
     });
-  
+
     // const filePreviews = allFiles.map(file => {
     //   // const reader = new FileReader();
     // //   reader.onloadend = () => {
@@ -664,83 +669,72 @@ console.log(" -->>>>" ,formData );
         </StyledFormContainer>
       </div>
       
-      
       {isFormActive && (
-     
-
-        <PreviewContainer className='asd' >
+    <PreviewContainer className='asd'>
         <div className="row">
-        <div className="col-md">
-    {imagePreview && (
-        <div className="image-containerrr">
-            <ProductImage
-                className="mainn"
-                src={imagePreview[0]}
-                alt="Product Preview"
-                style={{ height: "100%", maxHeight: "617px", maxWidth: "475px", width: "100%" }}
-            />
-            <div className="thumbnail-container">
-                {imagePreview.slice(1).map((src, index) => (
-                    <ProductImage
-                        key={index}
-                        className="thumbnail-image"
-                        src={src}
-                        alt={`Thumbnail ${index + 1}`}
-                        style={{ height: "100%", maxHeight: "150px", maxWidth: "150px", width: "100%" }}
-                    />
+            <div className="col-md">
+                {imagePreview && (
+                    <div className="image-containerrr">
+                        <ProductImage
+                            className="mainn"
+                            src={activeImage}  // Display the active image
+                            alt="Product Preview"
+                            style={{ height: "100%", maxHeight: "617px", maxWidth: "475px", width: "100%" }}
+                        />
+                        <div className="thumbnail-container">
+                            {imagePreview.map((src, index) => (
+                                <ProductImage
+                                    key={index}
+                                    className="thumbnail-image"
+                                    src={src}
+                                    alt={`Thumbnail ${index + 1}`}
+                                    style={{ height: "100%", maxHeight: "150px", maxWidth: "150px", width: "100%" }}
+                                    onClick={() => setActiveImage(src)}  // Set clicked thumbnail as active
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className="col-md">
+                <h3>Preview Section</h3>
+                <p><strong>Title:</strong> {title}</p>
+                <p><strong>Price:</strong> {price}</p>
+                <p><strong>Description:</strong> {description}</p>
+                <p><strong>Material:</strong> {material}</p>
+                <p><strong>Discount:</strong> {discount}%</p>
+                <p><strong>Price After Discount:</strong> {priceAfterDiscount}</p>
+                {SizecolorsStock.map((item, index) => (
+                    <div key={index}>
+                        <strong>Size:</strong> {item.size}
+                        {item.variants.map((variant, variantIndex) => (
+                            <div
+                                key={variantIndex}
+                                style={{
+                                    paddingLeft: '20px',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        width: '20px',
+                                        height: '20px',
+                                        backgroundColor: variant.color,
+                                        marginRight: '10px',
+                                        border: '1px solid #ccc' // Optional: to add a border around the color box
+                                    }}
+                                ></div>
+                            </div>
+                        ))}
+                    </div>
                 ))}
             </div>
         </div>
-    )}
-</div>
+    </PreviewContainer>
+)}
 
-        <div className="col-md">
-          <h3>Preview Section</h3>
-        
-          <p><strong>Title:</strong> {title}</p>
-          <p><strong>Price:</strong> {price}</p>
-          <p><strong>Description:</strong> {description}</p>
-
-          <p><strong>Material:</strong> {material}</p>
-          <p><strong>Discount:</strong> {discount}%</p>
-          <p><strong>Price After Discount:</strong> {priceAfterDiscount}</p>
-{SizecolorsStock.map((item, index) => (
-  <div key={index}>
-    <strong>Size:</strong> {item.size}
-    {item.variants.map((variant, variantIndex) => (
-      <div
-        key={variantIndex}
-        style={{
-          paddingLeft: '20px',
-          display: 'flex',
-          alignItems: 'center'
-        }}
-      >
-        <div
-          style={{
-            width: '20px',
-            height: '20px',
-            backgroundColor: variant.color,
-            marginRight: '10px',
-            border: '1px solid #ccc' // Optional: to add a border around the color box
-          }}
-        ></div>
-      </div>
-    ))}
-  </div>
-))}
-
-          {/* <ImagesContainer>
-            {imagePreview.map((img, index) => (
-              <ProductImage key={index} src={img} alt={`Preview ${index + 1}`} />
-            ))}
-          </ImagesContainer> */}
-          </div>
-          </div>
-        </PreviewContainer>
-
-
- )}
  
     </Container>
 
