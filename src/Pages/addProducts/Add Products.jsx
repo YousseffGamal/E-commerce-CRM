@@ -7,6 +7,7 @@ import axiosInstance from '../../axios';
 const Container = styled.div`
   display: flex;
   height: auto;
+  
 `;
 
 const fadeIn = keyframes`
@@ -267,6 +268,7 @@ const AddProductForm = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    alert('Product added successfully')
 
     const formData = new FormData();
     formData.append('title', title);
@@ -324,6 +326,7 @@ console.log(" -->>>>" ,formData );
       const response = await axiosInstance.post('/addproduct', formData, {
         headers: {
           // 'Content-Type': 'multipart/form-data',
+          
         },
       });
 
@@ -418,8 +421,7 @@ console.log(" -->>>>" ,formData );
   };
 
   return (
-    <Container>
-      
+    <Container >
       <Sidebar />
       <div style={{ display: 'flex', width: '100%', padding: '20px' }}>
         <StyledFormContainer isFormActive={isFormActive}>
@@ -623,13 +625,43 @@ console.log(" -->>>>" ,formData );
     </div>
   ))}
 </div>
-
-
             <Button type="submit">Submit</Button>
+            
           </Form>
         </StyledFormContainer>
       </div>
+      <div style={{ marginTop: '30px', marginRight: '25px' }}>
+<PreviewContainer >
+          <h3>Preview Section</h3>
+          <p><strong>Title:</strong> {title}</p>
+          <p><strong>Price:</strong> {price}</p>
+          <p><strong>Description:</strong> {description}</p>
+          <p><strong>Category:</strong> {categories.find(cat => cat._id === category)?.name}</p>
+          <p><strong>Sub-Category:</strong> {subCat.find(sub => sub._id === subCategory)?.name}</p>
+          <p><strong>Brand:</strong> {brands.find(br => br._id === brand)?.name}</p>
+          <p><strong>Material:</strong> {material}</p>
+          <p><strong>Discount:</strong> {discount}%</p>
+          <p><strong>Price After Discount:</strong> {priceAfterDiscount}</p>
+          <p><strong>Size/Color/Stock Combinations:</strong></p>
+          {SizecolorsStock.map((item, index) => (
+            <div key={index}>
+              <strong>Size:</strong> {item.size}
+              {item.variants.map((variant, variantIndex) => (
+                <div key={variantIndex} style={{ paddingLeft: '20px' }}>
+                  <strong>Color:</strong> {variant.color}, <strong>Stock:</strong> {variant.stock}
+                </div>
+              ))}
+            </div>
+          ))}
+          <ImagesContainer>
+            {imagePreview.map((img, index) => (
+              <ProductImage key={index} src={img} alt={`Preview ${index + 1}`} />
+            ))}
+          </ImagesContainer>
+        </PreviewContainer>
+</div>
     </Container>
+
   );
 };
 
