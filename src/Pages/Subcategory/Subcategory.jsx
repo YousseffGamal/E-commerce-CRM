@@ -143,7 +143,7 @@ const SubcategoriesPage = () => {
     setSelectedCategory(subcategory.category._id);
     setShowEditModal(true);
   };
-  const navigate = useNavigate()
+
 
   const handleDelete = () => {
     if (deleteId) {
