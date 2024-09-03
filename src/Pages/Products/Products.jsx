@@ -133,6 +133,17 @@ const ManageProducts = () => {
     fetchProducts();
   }, []);
 
+  // const handleDelete = async () => {
+  //   try {
+  //     await axios.delete(`http://localhost:3000/deleteproduct/${productToDelete}`);
+  //     setProducts(products.filter((product) => product._id !== productToDelete));
+  //     setShowDeleteModal(false);
+  //     setShowSuccessModal(true); // Show success message modal
+  //     setProductToDelete(null);
+  //   } catch (error) {
+  //     console.error('Error deleting product:', error);
+  //   }
+  // };
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:3000/deleteproduct/${productToDelete}`);
@@ -142,8 +153,19 @@ const ManageProducts = () => {
       setProductToDelete(null);
     } catch (error) {
       console.error('Error deleting product:', error);
+      setShowDeleteModal(false);
     }
   };
+  const confirmDelete = (productId) => {
+    setProductToDelete(productId);
+    setShowDeleteModal(true);
+  };
+  const deleteProduct = (id) => {
+    confirmDelete(id);
+  };
+  
+  // When user confirms the delete action, `handleDelete` will be called
+      
 
   const handleEdit = (product) => {
     setSelectedProduct(product);

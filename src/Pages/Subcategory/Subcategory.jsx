@@ -144,6 +144,7 @@ const SubcategoriesPage = () => {
     setSelectedCategory(subcategory.category._id);
     setShowEditModal(true);
   };
+  const navigate = useNavigate()
 
   const handleDelete = () => {
     if (deleteId) {
@@ -220,7 +221,7 @@ const SubcategoriesPage = () => {
                 <Th>ID</Th>
                 <Th>Title</Th>
                 <Th>Category</Th>
-                <Th style={{textAlign:"centerd"}}>Actions</Th>
+                <Th style={{textAlign:"center"}}>Actions</Th>
               </tr>
             </thead>
             <tbody>
