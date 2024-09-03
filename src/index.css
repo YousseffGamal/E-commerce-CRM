@@ -608,3 +608,9 @@ font-family: "LufgaRegular";
     font-size: 36px; /* Adjust for extra-large screens */
   }
 }
+/* App.css or a similar global stylesheet */
+/* App.css or a similar global stylesheet */
+.login-page-bg {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
