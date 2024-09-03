@@ -7,9 +7,10 @@ import axiosInstance from '../../axios';
 const Container = styled.div`
   display: flex;
   height: auto;
-  
-`;
+// 
 
+`;
+// justify-content: space-evenly;
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -416,6 +417,48 @@ console.log(" -->>>>" ,formData );
     }
   };
 
+  const addColorsStock = () => {
+    if (size && color && stock) {
+      // Check if the size already exists
+      const index = SizecolorsStock.findIndex(item => item.size === size);
+      if (index >= 0) {
+        // Size exists, so we update the existing entry's variants
+        setSizecolorsStock(SizecolorsStock.map((item, idx) => {
+          if (idx === index) {
+            return {
+              ...item,
+              variants: [
+                ...item.variants,
+                {
+                  color,
+                  stock,
+                }
+              ]
+            };
+          }
+          return item;
+        }));
+      } else {
+        // Size does not exist, so we add a new size with its variant
+        setSizecolorsStock([
+          ...SizecolorsStock,
+          {
+            size,
+            variants: [
+              {
+                color,
+                stock,
+              }
+            ]
+          }
+        ]);
+      }
+      // Clear the inputs after adding
+      setColor('');
+      setStock('');
+    }
+  }
+  
   const removeSizecolorsStock = (index) => {
     setSizecolorsStock(SizecolorsStock.filter((_, i) => i !== index));
   };
@@ -601,9 +644,14 @@ console.log(" -->>>>" ,formData );
               />
             </FormGroup>
 
+            <Button type="button" onClick={addColorsStock}>
+              Add color/Stock 
+            </Button>
+
             <Button type="button" onClick={addSizecolorsStock}>
               Add Size/color/Stock
             </Button>
+            
 
           <div>
   {SizecolorsStock.map((scs, index) => (
@@ -630,15 +678,28 @@ console.log(" -->>>>" ,formData );
           </Form>
         </StyledFormContainer>
       </div>
-      <div style={{ marginTop: '30px', marginRight: '25px' }}>
-<PreviewContainer >
+      
+      
+      {isFormActive && (
+      <div >
+      {/* style={{ marginTop: '30px' , marginRight: '200px' , width: '450px'}} */}
+        <PreviewContainer >
+        <div className="row">
+        <div className="col-md">
+            {imagePreview && <ProductImage style={{height:"100%",maxHeight:"617px",maxWidth:"475px",width:"100%"}} src={imagePreview} alt="Product Preview" />}
+        </div>
+
           <h3>Preview Section</h3>
+        <div className="col-md">
           <p><strong>Title:</strong> {title}</p>
           <p><strong>Price:</strong> {price}</p>
           <p><strong>Description:</strong> {description}</p>
-          <p><strong>Category:</strong> {categories.find(cat => cat._id === category)?.name}</p>
+
+          {/* {categories.find(cat => cat._id === category)?.name}
+          <p><strong>Category:</strong> {category}</p>
+
           <p><strong>Sub-Category:</strong> {subCat.find(sub => sub._id === subCategory)?.name}</p>
-          <p><strong>Brand:</strong> {brands.find(br => br._id === brand)?.name}</p>
+          <p><strong>Brand:</strong> {brands.find(br => br._id === brand)?.name}</p> */}
           <p><strong>Material:</strong> {material}</p>
           <p><strong>Discount:</strong> {discount}%</p>
           <p><strong>Price After Discount:</strong> {priceAfterDiscount}</p>
@@ -653,13 +714,18 @@ console.log(" -->>>>" ,formData );
               ))}
             </div>
           ))}
-          <ImagesContainer>
+          {/* <ImagesContainer>
             {imagePreview.map((img, index) => (
               <ProductImage key={index} src={img} alt={`Preview ${index + 1}`} />
             ))}
-          </ImagesContainer>
+          </ImagesContainer> */}
+          </div>
+          </div>
         </PreviewContainer>
 </div>
+
+ )}
+ 
     </Container>
 
   );
