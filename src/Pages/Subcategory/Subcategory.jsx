@@ -5,6 +5,7 @@ import axiosInstance from '../../axios';
 import Sidebar from '../../component/sidebar/Sidebar';
 import { useAuth } from '../../store/authContext';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'; // Importing the edit and delete icons
+import { useNavigate } from 'react-router-dom';
 
 const AppContainer = styled.div`
   display: flex;
@@ -143,6 +144,7 @@ const SubcategoriesPage = () => {
     setSelectedCategory(subcategory.category._id);
     setShowEditModal(true);
   };
+  const navigate = useNavigate()
 
   const handleDelete = () => {
     if (deleteId) {
